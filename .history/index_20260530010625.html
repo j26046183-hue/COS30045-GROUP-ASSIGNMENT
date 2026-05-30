@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Are Young Drivers Australia's Biggest Road Risk?</title>
+    
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav id="navbar">
+        <div class="nav-brand">🚗 Road Safety AU</div>
+        <ul class="nav-links">
+            <li><a href="#intro">Home</a></li>
+            <li><a href="#age-group">Age Group</a></li>
+            <li><a href="#location">Location</a></li>
+            <li><a href="#drug-tests">Drug Tests</a></li>
+            <li><a href="#state">By State</a></li>
+        </ul>
+    </nav>
+
+    <!-- SECTION 1 - LANDING -->
+    <section id="intro">
+        <h1>Are Young Drivers Australia's Biggest Road Risk?</h1>
+        <p>Exploring road safety enforcement data from 2023 — fines, drug tests, and arrests across Australia</p>
+        <a href="#age-group" class="btn">Start Exploring ↓</a>
+    </section>
+
+    <!-- SECTION 2 - FINES BY AGE GROUP -->
+    <section id="age-group">
+        <h2>Who is getting fined the most?</h2>
+        <p>Comparing fine counts across age groups and offence types</p>
+        <div id="age-group-chart"></div>
+    </section>
+
+    <!-- SECTION 3 - FINES BY LOCATION -->
+    <section id="location">
+        <h2>Where are offences happening?</h2>
+        <p>Breakdown of fines by location type and age group</p>
+        <div id="location-chart"></div>
+    </section>
+
+    <!-- SECTION 4 - DRUG TESTS -->
+    <section id="drug-tests">
+        <h2>How has drug driving changed?</h2>
+        <p>Positive drug test counts by substance type over time</p>
+        <div id="drug-chart"></div>
+    </section>
+
+    <!-- SECTION 5 - STATE COMPARISON -->
+    <section id="state">
+        <h2>How do states compare?</h2>
+        <p>Total fines and enforcement activity by Australian state</p>
+        <div id="state-chart"></div>
+    </section>
+
+    <!-- Your JS files -->
+    <script src="js/age-group.js"></script>
+    <script src="js/location.js"></script>
+    <script src="js/drug-tests.js"></script>
+    <script src="js/state.js"></script>
+
+</body>
+</html>
