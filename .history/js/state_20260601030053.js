@@ -67,7 +67,8 @@ d3.csv("data/fines_age_metric.csv").then(function(rawData) {
             .sort((a, b) => b.total - a.total);
 
         // Update color scale domain
-        stateColorScale.domain([d3.min(stateData, d => d.total), d3.max(stateData, d => d.total)]);
+        stateColorScale.domain([0, d3.max(stateData, d => d.total)]);
+
         // X scale
         const x = d3.scaleLinear()
             .domain([0, d3.max(stateData, d => d.total)])

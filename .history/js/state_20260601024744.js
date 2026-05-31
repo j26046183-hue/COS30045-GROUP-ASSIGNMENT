@@ -23,7 +23,7 @@ const stateSvg = d3.select("#state-chart")
 
 // Color scale
 const stateColorScale = d3.scaleSequential()
-    .interpolator(d3.interpolateRgb("#93c5fd", "#1e3a8a"));
+    .interpolator(d3.interpolateBlues);
 
 // Load data
 d3.csv("data/fines_age_metric.csv").then(function(rawData) {
@@ -67,7 +67,8 @@ d3.csv("data/fines_age_metric.csv").then(function(rawData) {
             .sort((a, b) => b.total - a.total);
 
         // Update color scale domain
-        stateColorScale.domain([d3.min(stateData, d => d.total), d3.max(stateData, d => d.total)]);
+        stateColorScale.domain([0, d3.max(stateData, d => d.total)]);
+
         // X scale
         const x = d3.scaleLinear()
             .domain([0, d3.max(stateData, d => d.total)])

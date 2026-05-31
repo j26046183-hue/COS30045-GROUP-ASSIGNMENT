@@ -29,7 +29,7 @@
     <section id="intro">
         <div class="hero-bg-grid"></div>
         <div class="hero-content">
-            <div class="hero-tag">Australian Road Safety Data · 2024</div>
+            <div class="hero-tag">Australian Road Safety Data · 2023</div>
             <h1>Are Young Drivers <br><span class="highlight">Australia's Biggest</span><br> Road Risk?</h1>
             <p>Exploring enforcement data across fines, drug tests, and arrests — broken down by age, location, and state.</p>
             <a href="#age-group" class="btn-hero">Start Exploring <span class="arrow">↓</span></a>
@@ -48,7 +48,7 @@
                 <span class="stat-label">Age groups</span>
             </div>
             <div class="hero-stat">
-                <span class="stat-num">2024</span>
+                <span class="stat-num">2023</span>
                 <span class="stat-label">Data year</span>
             </div>
         </div>
@@ -65,10 +65,22 @@
             <label>Filter by State:</label>
             <select id="age-state-filter">
                 <option value="all">All States</option>
+                <option value="NSW">NSW</option>
+                <option value="VIC">VIC</option>
+                <option value="QLD">QLD</option>
+                <option value="SA">SA</option>
+                <option value="WA">WA</option>
+                <option value="TAS">TAS</option>
+                <option value="NT">NT</option>
+                <option value="ACT">ACT</option>
             </select>
             <label>Filter by Offence:</label>
             <select id="age-offence-filter">
                 <option value="all">All Offences</option>
+                <option value="speed_fine">Speeding</option>
+                <option value="mobile_phone">Mobile Phone</option>
+                <option value="non_wearing">Seatbelt</option>
+                <option value="unlicensed">Unlicensed</option>
             </select>
         </div>
         <div class="chart-card">
@@ -88,13 +100,14 @@
             <p>Breakdown of fines by location type — Major Cities, Outer Regional, and Remote Areas</p>
         </div>
         <div class="chart-controls">
-            <label>Filter by State:</label>
-            <select id="loc-state-filter">
-                <option value="all">All States</option>
-            </select>
             <label>Filter by Age Group:</label>
             <select id="loc-age-filter">
                 <option value="all">All Ages</option>
+                <option value="0-16">0–16</option>
+                <option value="17-25">17–25</option>
+                <option value="26-39">26–39</option>
+                <option value="40-64">40–64</option>
+                <option value="65 and over">65 and over</option>
             </select>
         </div>
         <div class="chart-card">
@@ -113,18 +126,7 @@
             <h2>How has drug driving changed?</h2>
             <p>Positive drug test counts by substance type — Cannabis, Methamphetamine, and more</p>
         </div>
-        <div class="chart-controls">
-            <label>Filter by State:</label>
-            <select id="drug-state-filter">
-                <option value="all">All States</option>
-            </select>
-            <label>Filter by Year:</label>
-            <select id="drug-year-filter">
-                <option value="all">All Years</option>
-                <option value="2023">2023</option>
-                <option value="2024">2024</option>
-            </select>
-        </div>
+        
         <div class="chart-two-col">
             <div class="chart-card">
                 <h3 class="chart-title">Positive Tests Over Time</h3>
@@ -137,7 +139,7 @@
         </div>
         <div class="insight-box">
             <span class="insight-icon">💡</span>
-            <span>Key insight: <strong>Amphetamine</strong> is the most commonly detected substance in positive drug tests</span>
+            <span>Key insight: <strong>Cannabis and methamphetamine</strong> are the most commonly detected substances</span>
         </div>
     </section>
 
@@ -146,16 +148,16 @@
         <div class="section-header">
             <div class="section-tag">04 — By State</div>
             <h2>How do states compare?</h2>
-            <p>Total fines ranked by Australian state — filter by age group and offence type</p>
+            <p>Total fines and enforcement activity ranked by Australian state</p>
         </div>
         <div class="chart-controls">
-            <label>Filter by Age Group:</label>
-            <select id="state-age-filter">
-                <option value="all">All Ages</option>
-            </select>
             <label>Filter by Offence:</label>
-            <select id="state-metric-filter">
+            <select id="state-offence-filter">
                 <option value="all">All Offences</option>
+                <option value="speed_fine">Speeding</option>
+                <option value="mobile_phone">Mobile Phone</option>
+                <option value="non_wearing">Seatbelt</option>
+                <option value="unlicensed">Unlicensed</option>
             </select>
         </div>
         <div class="chart-card">
@@ -171,7 +173,7 @@
     <footer>
         <div class="footer-content">
             <div class="footer-brand">Road Safety AU</div>
-            <p>Data sourced from the Bureau of Infrastructure and Transport Research Economics (BITRE), 2024.</p>
+            <p>Data sourced from the Bureau of Infrastructure and Transport Research Economics (BITRE), 2023.</p>
             <p>Built for COS30045 Data Visualisation · Swinburne University of Technology</p>
         </div>
     </footer>
