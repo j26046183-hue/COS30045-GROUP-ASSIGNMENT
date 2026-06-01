@@ -1,12 +1,12 @@
 // =====================
 // FINES BY AGE GROUP
-// Bar Chart — X axis = Age Groups
-// With State + Offence Filters
+// Grouped Bar Chart
+// With State + Metric Filters
 // =====================
 
-const ageMargin = { top: 20, right: 40, bottom: 80, left: 80 };
+const ageMargin = { top: 20, right: 160, bottom: 80, left: 80 };
 const ageWidth = document.getElementById("age-group-chart").offsetWidth - ageMargin.left - ageMargin.right;
-const ageHeight = 500 - ageMargin.top - ageMargin.bottom;
+const ageHeight = 600 - ageMargin.top - ageMargin.bottom;
 
 // Tooltip
 const ageTooltip = d3.select("body")
@@ -21,17 +21,16 @@ const ageSvg = d3.select("#age-group-chart")
     .append("g")
     .attr("transform", `translate(${ageMargin.left},${ageMargin.top})`);
 
-// Age groups in order
-const ageGroups = ["Under 17", "17-25", "26-39", "40-64", "65 and over"];
+// Age group colors
+const ageColors = {
+    "Under 17":    "#93c5fd",
+    "17-25":       "#2563eb",
+    "26-39":       "#16a34a",
+    "40-64":       "#f59e0b",
+    "65 and over": "#dc2626"
+};
 
-// Color scale — single blue ramp per age group
-const ageBarColors = [
-    "#bfdbfe",
-    "#60a5fa",
-    "#2563eb",
-    "#1d4ed8",
-    "#1e3a8a"
-];
+const ageGroups = ["Under 17", "17-25", "26-39", "40-64", "65 and over"];
 
 // Load data
 d3.csv("data/fines_age_metric.csv").then(function(rawData) {
@@ -48,7 +47,7 @@ d3.csv("data/fines_age_metric.csv").then(function(rawData) {
     const stateFilter = d3.select("#age-state-filter");
     states.forEach(s => stateFilter.append("option").attr("value", s).text(s));
 
-    // Populate offence filter dynamically
+    // Populate offence filter dynamically — NO "All Offences" option
     const metrics = [...new Set(rawData.map(d => d.METRIC))].sort();
     const offenceFilter = d3.select("#age-offence-filter");
     metrics.forEach(m => offenceFilter.append("option")
@@ -60,23 +59,31 @@ d3.csv("data/fines_age_metric.csv").then(function(rawData) {
 
         ageSvg.selectAll("*").remove();
 
-        // Sum fines per age group
-        const chartData = ageGroups.map((age, i) => ({
-            age,
-            value: d3.sum(data.filter(d => d.AGE_GROUP === age), d => d["TOTAL FINES"]),
-            color: ageBarColors[i]
-        }));
+        // Get unique metrics from filtered data
+        const activeMetrics = [...new Set(data.map(d => d.METRIC))].sort();
 
-        // X scale — age groups
-        const x = d3.scaleBand()
-            .domain(ageGroups)
+        // X0 - metrics
+        const x0 = d3.scaleBand()
+            .domain(activeMetrics)
             .range([0, ageWidth])
-            .padding(0.3);
+            .padding(0.25);
+
+        // X1 - age groups within metric
+        const x1 = d3.scaleBand()
+            .domain(ageGroups)
+            .range([0, x0.bandwidth()])
+            .padding(0.08);
+
+        // Calculate max summed value
+        const maxVal = d3.max(activeMetrics, metric =>
+            d3.max(ageGroups, age =>
+                d3.sum(data.filter(d => d.AGE_GROUP === age && d.METRIC === metric), d => d["TOTAL FINES"])
+            )
+        );
 
         // Y scale
-        const maxVal = d3.max(chartData, d => d.value);
         const y = d3.scaleLinear()
-            .domain([0, maxVal * 1.1])
+            .domain([0, maxVal * 1.05])
             .range([ageHeight, 0]);
 
         // Gridlines
@@ -96,10 +103,12 @@ d3.csv("data/fines_age_metric.csv").then(function(rawData) {
         ageSvg.append("g")
             .attr("class", "axis")
             .attr("transform", `translate(0,${ageHeight})`)
-            .call(d3.axisBottom(x))
+            .call(d3.axisBottom(x0)
+                .tickFormat(d => d.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())))
             .selectAll("text")
+            .attr("transform", "rotate(0)")
             .style("text-anchor", "middle")
-            .style("font-size", "13px")
+            .style("font-size", "12px")
             .attr("dy", "1.5em");
 
         // Y axis
@@ -125,24 +134,35 @@ d3.csv("data/fines_age_metric.csv").then(function(rawData) {
             .attr("font-family", "DM Sans, sans-serif")
             .text("Total Fines");
 
-        // Bars
-        ageSvg.selectAll(".bar")
-            .data(chartData)
+        // Bars grouped by metric
+        const metricGroups = ageSvg.selectAll(".metric-group")
+            .data(activeMetrics)
+            .enter()
+            .append("g")
+            .attr("class", "metric-group")
+            .attr("transform", d => `translate(${x0(d)},0)`);
+
+        metricGroups.selectAll("rect")
+            .data(metric => ageGroups.map(age => ({
+                age,
+                metric,
+                value: d3.sum(data.filter(d => d.AGE_GROUP === age && d.METRIC === metric), d => d["TOTAL FINES"])
+            })))
             .enter()
             .append("rect")
-            .attr("class", "bar")
-            .attr("x", d => x(d.age))
+            .attr("x", d => x1(d.age))
             .attr("y", ageHeight)
-            .attr("width", x.bandwidth())
+            .attr("width", x1.bandwidth())
             .attr("height", 0)
-            .attr("rx", 6)
-            .attr("fill", d => d.color)
+            .attr("rx", 3)
+            .attr("fill", d => ageColors[d.age])
             .on("mouseover", function(event, d) {
-                d3.select(this).attr("opacity", 0.8);
+                d3.select(this).attr("opacity", 0.75);
                 ageTooltip
                     .style("opacity", 1)
                     .html(`<strong>${d.age}</strong><br>
-                           Total Fines: ${d.value.toLocaleString()}`);
+                           Offence: ${d.metric.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}<br>
+                           Fines: ${d.value.toLocaleString()}`);
             })
             .on("mousemove", function(event) {
                 ageTooltip
@@ -155,23 +175,32 @@ d3.csv("data/fines_age_metric.csv").then(function(rawData) {
             })
             .transition()
             .duration(700)
-            .delay((d, i) => i * 80)
-            .attr("y", d => d.value > 0 ? y(d.value) : ageHeight)
+            .delay((d, i) => i * 40)
+            .attr("y", d => d.value > 0 ? Math.min(y(d.value), ageHeight - 3) : ageHeight)
             .attr("height", d => d.value > 0 ? Math.max(ageHeight - y(d.value), 3) : 0);
 
-        // Value labels on top of bars — exact numbers
-        ageSvg.selectAll(".bar-label")
-            .data(chartData)
-            .enter()
-            .append("text")
-            .attr("class", "bar-label")
-            .attr("x", d => x(d.age) + x.bandwidth() / 2)
-            .attr("y", d => y(d.value) - 8)
-            .attr("text-anchor", "middle")
-            .attr("font-size", "12px")
-            .attr("fill", "#475569")
-            .attr("font-family", "DM Sans, sans-serif")
-            .text(d => d.value === 0 ? "" : d.value.toLocaleString());
+        // Legend
+        const legend = ageSvg.append("g")
+            .attr("transform", `translate(${ageWidth + 20}, 0)`);
+
+        ageGroups.forEach((age, i) => {
+            const row = legend.append("g")
+                .attr("transform", `translate(0, ${i * 26})`);
+
+            row.append("rect")
+                .attr("width", 12)
+                .attr("height", 12)
+                .attr("rx", 3)
+                .attr("fill", ageColors[age]);
+
+            row.append("text")
+                .attr("x", 18)
+                .attr("y", 10)
+                .attr("font-size", "12px")
+                .attr("fill", "#475569")
+                .attr("font-family", "DM Sans, sans-serif")
+                .text(age);
+        });
     }
 
     // Filter function
@@ -185,6 +214,7 @@ d3.csv("data/fines_age_metric.csv").then(function(rawData) {
             filtered = filtered.filter(d => d.STATE === selectedState);
         }
 
+        // Always filter by selected offence — no "All" option
         filtered = filtered.filter(d => d.METRIC === selectedOffence);
 
         drawAgeChart(filtered);

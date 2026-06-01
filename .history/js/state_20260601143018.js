@@ -47,7 +47,7 @@ d3.csv("data/fines_age_metric.csv").then(function(rawData) {
     metrics.forEach(metric => {
         metricFilter.append("option")
             .attr("value", metric)
-            .text(metric.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()));
+            .text(metric.replace(/_/g, " "));
     });
 
     // Draw chart function

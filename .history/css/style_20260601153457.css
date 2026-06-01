@@ -309,7 +309,7 @@ body {
     box-shadow: var(--card-shadow);
     border: 1px solid var(--gray-200);
     margin-bottom: 20px;
-    min-height: 600px;
+    min-height: 800px;
 }
 
 .chart-two-col {

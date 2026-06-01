@@ -159,7 +159,7 @@ d3.csv("data/fines_age_metric.csv").then(function(rawData) {
             .attr("y", d => d.value > 0 ? y(d.value) : ageHeight)
             .attr("height", d => d.value > 0 ? Math.max(ageHeight - y(d.value), 3) : 0);
 
-        // Value labels on top of bars — exact numbers
+       // Value labels on top of bars
         ageSvg.selectAll(".bar-label")
             .data(chartData)
             .enter()
@@ -172,7 +172,6 @@ d3.csv("data/fines_age_metric.csv").then(function(rawData) {
             .attr("fill", "#475569")
             .attr("font-family", "DM Sans, sans-serif")
             .text(d => d.value === 0 ? "" : d.value.toLocaleString());
-    }
 
     // Filter function
     function applyAgeFilters() {
