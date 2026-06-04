@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Australian Road Safety Enforcement</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav id="navbar">
+        <div class="nav-brand">
+            <span class="brand-dot"></span>
+            Road Safety AU
+        </div>
+        <ul class="nav-links">
+            <li><a href="#intro">Home</a></li>
+            <li><a href="#age-group">Age Group</a></li>
+            <li><a href="#location">Location</a></li>
+            <li><a href="#drug-tests">Drug Tests</a></li>
+            <li><a href="#state">By State</a></li>
+        </ul>
+    </nav>
+
+    <!-- SECTION 1 - HERO -->
+    <section id="intro">
+        <div class="hero-bg-grid"></div>
+        <div class="hero-content">
+            <div class="hero-tag">BITRE Road Safety Enforcement Data · 2024</div>
+            <h1>Australian Road Safety<br><span class="highlight">Enforcement</span><br>Dashboard</h1>
+            <p>Exploring enforcement data across fines, drug tests, and arrests — broken down by age, location, and state.</p>
+            <a href="#age-group" class="btn-hero">Start Exploring <span class="arrow">↓</span></a>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="stat-num">12,179</span>
+                <span class="stat-label">Records analysed</span>
+            </div>
+            <div class="hero-stat">
+                <span class="stat-num">8</span>
+                <span class="stat-label">States & territories</span>
+            </div>
+            <div class="hero-stat">
+                <span class="stat-num">5</span>
+                <span class="stat-label">Age groups</span>
+            </div>
+            <div class="hero-stat">
+                <span class="stat-num">2024</span>
+                <span class="stat-label">Data year</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2 - AGE GROUP -->
+    <section id="age-group" class="chart-section">
+
+        <!-- Story Question -->
+        <div class="story-question">
+            <span class="question-icon">❓</span>
+            <h3>Are young drivers being fined more than other age groups?</h3>
+        </div>
+
+        <div class="section-header">
+            <div class="section-tag">01 — Age Group</div>
+            <h2>Who is getting fined the most?</h2>
+            <p>Comparing fine counts across age groups and offence types across Australia. Select an offence type below to explore the data.</p>
+        </div>
+
+        <div class="chart-controls">
+            <label>Filter by State:</label>
+            <select id="age-state-filter">
+                <option value="all">All States</option>
+            </select>
+            <label>Filter by Offence:</label>
+            <select id="age-offence-filter"></select>
+        </div>
+
+        <div class="chart-card">
+            <div id="age-group-chart"></div>
+        </div>
+
+        <div class="insight-box">
+            <span class="insight-icon">💡</span>
+            <span>Key Insight: Drivers aged <strong>40–64</strong> receive the highest total fines overall, however drivers aged <strong>17–25</strong> are disproportionately represented given their smaller share of the total driving population — suggesting young drivers pose a higher per-capita road risk.</span>
+        </div>
+
+        <div class="recommendation-box">
+            <span class="rec-icon">✅</span>
+            <div>
+                <strong>Recommendation:</strong> Road safety authorities should implement <strong>targeted enforcement campaigns</strong> and awareness programs specifically aimed at drivers aged 17–25, particularly around speeding and mobile phone use, to reduce fine rates in this high-risk group.
+            </div>
+        </div>
+
+    </section>
+
+    <!-- SECTION 3 - LOCATION -->
+    <section id="location" class="chart-section alt-bg">
+
+        <!-- Story Question -->
+        <div class="story-question">
+            <span class="question-icon">❓</span>
+            <h3>Are drivers in major cities more likely to commit road offences?</h3>
+        </div>
+
+        <div class="section-header">
+            <div class="section-tag">02 — Location</div>
+            <h2>Where are offences happening?</h2>
+            <p>Breakdown of fines by location type — Major Cities, Regional, and Remote Areas across Australia.</p>
+        </div>
+
+        <div class="chart-controls">
+            <label>Filter by State:</label>
+            <select id="loc-state-filter">
+                <option value="all">All States</option>
+            </select>
+            <label>Filter by Age Group:</label>
+            <select id="loc-age-filter">
+                <option value="all">All Ages</option>
+            </select>
+        </div>
+
+        <div class="chart-card">
+            <div id="location-chart"></div>
+        </div>
+
+        <div class="insight-box">
+            <span class="insight-icon">💡</span>
+            <span>Key Insight: <strong>Major cities</strong> account for the highest fine counts due to higher population density and increased traffic volume, while remote areas show relatively lower enforcement activity.</span>
+        </div>
+
+        <div class="recommendation-box">
+            <span class="rec-icon">✅</span>
+            <div>
+                <strong>Recommendation:</strong> While major cities dominate in total fines, authorities should consider <strong>increasing enforcement presence</strong> in outer regional and remote areas where road conditions are more hazardous and enforcement is less frequent.
+            </div>
+        </div>
+
+    </section>
+
+    <!-- SECTION 4 - DRUG TESTS -->
+    <section id="drug-tests" class="chart-section">
+
+        <!-- Story Question -->
+        <div class="story-question">
+            <span class="question-icon">❓</span>
+            <h3>Is drug driving becoming a bigger problem on Australian roads?</h3>
+        </div>
+
+        <div class="section-header">
+            <div class="section-tag">03 — Drug Tests</div>
+            <h2>How has drug driving changed?</h2>
+            <p>Positive drug test counts by substance type — Cannabis, Amphetamine, and more across 2023 and 2024.</p>
+        </div>
+
+        <div class="chart-controls">
+            <label>Filter by State:</label>
+            <select id="drug-state-filter">
+                <option value="all">All States</option>
+            </select>
+            <label>Filter by Year:</label>
+            <select id="drug-year-filter">
+                <option value="all">All Years</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+            </select>
+        </div>
+
+        <div class="chart-two-col">
+            <div class="chart-card">
+                <h3 class="chart-title">Positive Tests Over Time</h3>
+                <div id="drug-line-chart"></div>
+            </div>
+            <div class="chart-card">
+                <h3 class="chart-title">Drug Type Breakdown</h3>
+                <div id="drug-donut-chart"></div>
+            </div>
+        </div>
+
+        <div class="insight-box">
+            <span class="insight-icon">💡</span>
+            <span>Key Insight: <strong>Amphetamine</strong> is the most commonly detected substance in positive drug tests, followed by Cannabis. Drug test numbers remain consistently high across both 2023 and 2024, indicating drug driving is an ongoing road safety concern.</span>
+        </div>
+
+        <div class="recommendation-box">
+            <span class="rec-icon">✅</span>
+            <div>
+                <strong>Recommendation:</strong> Authorities should <strong>increase roadside drug testing frequency</strong>, particularly in states with high positive test rates, and focus public awareness campaigns on the dangers of driving under the influence of amphetamines and cannabis.
+            </div>
+        </div>
+
+    </section>
+
+    <!-- SECTION 5 - STATE -->
+    <section id="state" class="chart-section alt-bg">
+
+        <!-- Story Question -->
+        <div class="story-question">
+            <span class="question-icon">❓</span>
+            <h3>Which Australian states have the highest road safety enforcement activity?</h3>
+        </div>
+
+        <div class="section-header">
+            <div class="section-tag">04 — By State</div>
+            <h2>How do states compare?</h2>
+            <p>Total fines ranked by Australian state — filter by age group and offence type to explore patterns.</p>
+        </div>
+
+        <div class="chart-controls">
+            <label>Filter by Age Group:</label>
+            <select id="state-age-filter">
+                <option value="all">All Ages</option>
+            </select>
+            <label>Filter by Offence:</label>
+            <select id="state-metric-filter">
+                <option value="all">All Offences</option>
+            </select>
+        </div>
+
+        <div class="chart-card">
+            <div id="state-chart"></div>
+        </div>
+
+        <div class="insight-box">
+            <span class="insight-icon">💡</span>
+            <span>Key Insight: <strong>NSW and VIC</strong> consistently lead in total fines due to their larger populations and higher traffic volumes, while smaller states like ACT and TAS record significantly lower enforcement numbers.</span>
+        </div>
+
+        <div class="recommendation-box">
+            <span class="rec-icon">✅</span>
+            <div>
+                <strong>Recommendation:</strong> Smaller states should <strong>benchmark against NSW and VIC's enforcement strategies</strong> to identify gaps in road safety coverage. Population-adjusted fine rates should be used to more accurately compare enforcement effectiveness across states.
+            </div>
+        </div>
+
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">Road Safety AU</div>
+            <p>Data sourced from the Bureau of Infrastructure and Transport Research Economics (BITRE), 2024.</p>
+            <p>Built for COS30045 Data Visualisation · Swinburne University of Technology</p>
+        </div>
+    </footer>
+
+    <script src="js/age-group.js"></script>
+    <script src="js/location.js"></script>
+    <script src="js/drug-tests.js"></script>
+    <script src="js/state.js"></script>
+
+</body>
+</html>
