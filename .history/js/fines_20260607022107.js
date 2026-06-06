@@ -60,13 +60,13 @@ Promise.all([
     // Parse numeric dimensions cleanly
     historical.forEach(d => {
         d.YEAR = +d.YEAR;
-        d["TOTAL FINES"] = +d["TOTAL FINES"] || 0;
-        d["TOTAL ARRESTS"] = +d["TOTAL ARRESTS"] || 0;
-        d["TOTAL CHARGES"] = +d["TOTAL CHARGES"] || 0;
+        d["TOTAL FINES"] = +d["TOTAL FINES"];
+        d["TOTAL ARRESTS"] = +d["TOTAL ARRESTS"];
+        d["TOTAL CHARGES"] = +d["TOTAL CHARGES"];
     });
-    byState.forEach(d => d["TOTAL FINES"] = +d["TOTAL FINES"] || 0);
-    byAge.forEach(d => d["TOTAL FINES"] = +d["TOTAL FINES"] || 0);
-    byLocation.forEach(d => d["TOTAL FINES"] = +d["TOTAL FINES"] || 0);
+    byState.forEach(d => d["TOTAL FINES"] = +d["TOTAL FINES"]);
+    byAge.forEach(d => d["TOTAL FINES"] = +d["TOTAL FINES"]);
+    byLocation.forEach(d => d["TOTAL FINES"] = +d["TOTAL FINES"]);
 
     finesHistoricalData = historical;
     finesStateData = byState;
@@ -81,7 +81,6 @@ Promise.all([
     // Populate offence filter dynamically
     const metrics = [...new Set(finesHistoricalData.map(d => d.METRIC))].sort();
     const offenceFilter = d3.select("#fines-offence-filter");
-    offenceFilter.append("option").attr("value", "all").text("All Offences");
     metrics.forEach(m => offenceFilter.append("option")
         .attr("value", m)
         .text(metricLabels[m] || m));
@@ -102,7 +101,8 @@ function applyFinesFilters() {
     if (selectedState !== "all") filteredHistorical = filteredHistorical.filter(d => d.STATE === selectedState);
     if (selectedOffence !== "all") filteredHistorical = filteredHistorical.filter(d => d.METRIC === selectedOffence);
 
-    const rolledHistoricalMap = d3.rollup(filteredHistorical,
+    // Rollup historical data by metric and year to aggregate totals cleanly if multiple states intersect
+    const rolledHistoricalMap = d3.rollup(filteredHistorical, 
         v => d3.sum(v, d => d["TOTAL FINES"]),
         d => d.METRIC,
         d => d.YEAR
@@ -131,18 +131,20 @@ function applyFinesFilters() {
     if (selectedState !== "all") filteredLocation = filteredLocation.filter(d => d.STATE === selectedState);
     if (selectedOffence !== "all") filteredLocation = filteredLocation.filter(d => d.METRIC === selectedOffence);
 
-    // ── 5. UPDATE MINI STATS ──
+    // ── 5. UPDATE INTERACTIVE MINI STATS CARDS ──
+    // Compute Core Sums
     const totalFines = d3.sum(filteredAge, d => d["TOTAL FINES"]);
     const totalArrests = d3.sum(filteredHistorical, d => d["TOTAL ARRESTS"]);
     const totalCharges = d3.sum(filteredHistorical, d => d["TOTAL CHARGES"]);
 
-    const topStateSorted = [...finalState].sort((a,b) => b["TOTAL FINES"] - a["TOTAL FINES"]);
-    const topState = topStateSorted[0];
+    // Find Tops
+    const topState = finalState.sort((a,b) => b["TOTAL FINES"] - a["TOTAL FINES"])[0];
     const ageMap = d3.rollup(filteredAge, v => d3.sum(v, d => d["TOTAL FINES"]), d => d.AGE_GROUP);
     const topAge = [...ageMap.entries()].sort((a,b) => b[1]-a[1])[0];
     const metricMap = d3.rollup(filteredHistorical, v => d3.sum(v, d => d["TOTAL FINES"]), d => d.METRIC);
     const topOffence = [...metricMap.entries()].sort((a,b) => b[1]-a[1])[0];
 
+    // Push into DOM Elements
     d3.select("#fines-total").text(totalFines.toLocaleString());
     d3.select("#fines-arrests").text(totalArrests.toLocaleString());
     d3.select("#fines-charges").text(totalCharges.toLocaleString());
@@ -150,7 +152,7 @@ function applyFinesFilters() {
     d3.select("#fines-top-age").text(topAge ? topAge[0] : "—");
     d3.select("#fines-top-offence").text(topOffence ? (metricLabels[topOffence[0]] || topOffence[0]) : "—");
 
-    // ── 6. DRAW ALL CHARTS ──
+    // ── 6. DRAW ALL CONNECTED CHARTS ──
     drawFinesHistorical(finalHistorical);
     drawFinesState(finalState);
     drawFinesAge(filteredAge);
@@ -160,12 +162,11 @@ function applyFinesFilters() {
 // ── CHART 1: Historical Trend ──
 function drawFinesHistorical(data) {
     d3.select("#fines-historical-chart").selectAll("*").remove();
+
     if (data.length === 0) return;
 
     const margin = { top: 20, right: 160, bottom: 50, left: 80 };
-    const container = document.getElementById("fines-historical-chart");
-    if (!container) return;
-    const width = Math.max(container.offsetWidth - margin.left - margin.right, 100);
+    const width = document.getElementById("fines-historical-chart").offsetWidth - margin.left - margin.right;
     const height = 300 - margin.top - margin.bottom;
 
     const svg = d3.select("#fines-historical-chart")
@@ -178,16 +179,21 @@ function drawFinesHistorical(data) {
     const metrics = [...new Set(data.map(d => d.METRIC))];
     const grouped = d3.group(data, d => d.METRIC);
 
-    const x = d3.scaleLinear().domain(d3.extent(data, d => d.YEAR)).range([0, width]);
+    const x = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.YEAR))
+        .range([0, width]);
+
     const y = d3.scaleLinear()
         .domain([0, d3.max(data, d => d["TOTAL FINES"]) * 1.1 || 100])
         .range([height, 0]);
 
+    // Grid
     svg.append("g").attr("class", "grid")
         .call(d3.axisLeft(y).ticks(5).tickSize(-width).tickFormat(""))
         .selectAll("line").style("stroke", "#f1f5f9").style("stroke-dasharray", "4,4");
     svg.select(".grid .domain").remove();
 
+    // Axes
     svg.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x).tickFormat(d3.format("d")).ticks(8));
 
@@ -199,6 +205,7 @@ function drawFinesHistorical(data) {
             return d;
         }));
 
+    // Y label
     svg.append("text")
         .attr("transform", "rotate(-90)").attr("y", -65).attr("x", -height/2)
         .attr("text-anchor", "middle").attr("font-size", "11px")
@@ -208,14 +215,14 @@ function drawFinesHistorical(data) {
     const line = d3.line().x(d => x(d.YEAR)).y(d => y(d["TOTAL FINES"])).curve(d3.curveMonotoneX);
 
     grouped.forEach((values, metric) => {
-        const sorted = [...values].sort((a,b) => a.YEAR - b.YEAR);
+        const sorted = values.sort((a,b) => a.YEAR - b.YEAR);
         const color = metricColors[metric] || "#94a3b8";
 
         svg.append("path").datum(sorted)
             .attr("fill", "none").attr("stroke", color)
             .attr("stroke-width", 2.5).attr("d", line);
 
-        svg.selectAll(`.dot-${metric.replace(/[^a-z0-9]/gi, '_')}`)
+        svg.selectAll(`.dot-${metric}`)
             .data(sorted).enter().append("circle")
             .attr("cx", d => x(d.YEAR)).attr("cy", d => y(d["TOTAL FINES"]))
             .attr("r", 3.5).attr("fill", color).attr("stroke", "white").attr("stroke-width", 1.5)
@@ -229,6 +236,7 @@ function drawFinesHistorical(data) {
             .on("mouseout", function() { finesTooltip.style("opacity", 0); });
     });
 
+    // Legend
     const legend = svg.append("g").attr("transform", `translate(${width + 12}, 0)`);
     metrics.forEach((m, i) => {
         const row = legend.append("g").attr("transform", `translate(0, ${i * 22})`);
@@ -243,12 +251,11 @@ function drawFinesHistorical(data) {
 // ── CHART 2: Fines by State ──
 function drawFinesState(data) {
     d3.select("#fines-state-chart").selectAll("*").remove();
+
     if (data.length === 0) return;
 
-    const margin = { top: 10, right: 120, bottom: 40, left: 60 };
-    const container = document.getElementById("fines-state-chart");
-    if (!container) return;
-    const width = Math.max(container.offsetWidth - margin.left - margin.right, 100);
+    const margin = { top: 10, right: 100, bottom: 40, left: 60 };
+    const width = document.getElementById("fines-state-chart").offsetWidth - margin.left - margin.right;
     const height = 320 - margin.top - margin.bottom;
 
     const svg = d3.select("#fines-state-chart")
@@ -258,14 +265,10 @@ function drawFinesState(data) {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // FIX: force numeric, sort safely, guard maxVal
     const sorted = [...data].sort((a,b) => +b["TOTAL FINES"] - +a["TOTAL FINES"]);
     const maxVal = d3.max(sorted, d => +d["TOTAL FINES"]) || 1;
-    const minVal = d3.min(sorted, d => +d["TOTAL FINES"]) || 0;
-
-    const colorScale = d3.scaleSequential()
-        .interpolator(d3.interpolateRgb("#93c5fd", "#1e3a8a"))
-        .domain([minVal, maxVal]);
+    const colorScale = d3.scaleSequential().interpolator(d3.interpolateRgb("#93c5fd", "#1e3a8a"))
+        .domain([d3.min(sorted, d => d["TOTAL FINES"]) || 0, d3.max(sorted, d => d["TOTAL FINES"]) || 1]);
 
     const x = d3.scaleLinear().domain([0, maxVal * 1.1]).range([0, width]);
     const y = d3.scaleBand().domain(sorted.map(d => d.STATE)).range([0, height]).padding(0.25);
@@ -277,42 +280,33 @@ function drawFinesState(data) {
     svg.select(".grid .domain").remove();
 
     svg.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(x).ticks(4).tickFormat(d => {
-            if (d === 0) return "0";
-            if (d >= 1000000) return `${(d/1000000).toFixed(1)}M`;
-            if (d >= 1000) return `${(d/1000).toFixed(0)}K`;
-            return d;
-        }));
+        .call(d3.axisBottom(x).ticks(4).tickFormat(d => d >= 1000000 ? `${(d/1000000).toFixed(1)}M` : `${(d/1000).toFixed(0)}K`));
 
     svg.append("g").attr("class", "axis").call(d3.axisLeft(y));
 
     svg.selectAll(".bar").data(sorted).enter().append("rect")
         .attr("class", "bar").attr("x", 0).attr("y", d => y(d.STATE))
         .attr("height", y.bandwidth()).attr("width", 0).attr("rx", 5)
-        // FIX: force numeric for color and width
-        .attr("fill", d => colorScale(+d["TOTAL FINES"]))
+        .attr("fill", d => colorScale(d["TOTAL FINES"]))
         .on("mouseover", function(event, d) {
             d3.select(this).attr("opacity", 0.8);
             finesTooltip.style("opacity", 1)
-                .html(`<strong>${d.STATE}</strong><br>Total Fines: ${(+d["TOTAL FINES"]).toLocaleString()}`);
+                .html(`<strong>${d.STATE}</strong><br>Total Fines: ${d["TOTAL FINES"].toLocaleString()}`);
         })
         .on("mousemove", function(event) {
             finesTooltip.style("left", (event.pageX + 14) + "px").style("top", (event.pageY - 32) + "px");
         })
         .on("mouseout", function() { d3.select(this).attr("opacity", 1); finesTooltip.style("opacity", 0); })
         .transition().duration(700).delay((d,i) => i * 80)
-        // FIX: Math.max to prevent negative width
-        .attr("width", d => Math.max(x(+d["TOTAL FINES"]), 0));
+        .attr("width", d => x(d["TOTAL FINES"]));
 
     svg.selectAll(".bar-label").data(sorted).enter().append("text")
         .attr("class", "bar-label")
-        // FIX: guard label position
-        .attr("x", d => Math.max(x(+d["TOTAL FINES"]), 0) + 6)
+        .attr("x", d => x(d["TOTAL FINES"]) + 6)
         .attr("y", d => y(d.STATE) + y.bandwidth() / 2 + 4)
         .attr("font-size", "11px").attr("fill", "#475569")
         .attr("font-family", "DM Sans, sans-serif")
-        // FIX: force numeric for toLocaleString
-        .text(d => (+d["TOTAL FINES"]).toLocaleString());
+        .text(d => d["TOTAL FINES"].toLocaleString());
 }
 
 // ── CHART 3: Fines by Age Group ──
@@ -320,9 +314,7 @@ function drawFinesAge(data) {
     d3.select("#fines-age-chart").selectAll("*").remove();
 
     const margin = { top: 10, right: 20, bottom: 60, left: 70 };
-    const container = document.getElementById("fines-age-chart");
-    if (!container) return;
-    const width = Math.max(container.offsetWidth - margin.left - margin.right, 100);
+    const width = document.getElementById("fines-age-chart").offsetWidth - margin.left - margin.right;
     const height = 320 - margin.top - margin.bottom;
 
     const svg = d3.select("#fines-age-chart")
@@ -337,11 +329,9 @@ function drawFinesAge(data) {
         value: d3.sum(data.filter(d => d.AGE_GROUP === age), d => d["TOTAL FINES"]),
         color: ageColors[i]
     }));
-
     const x = d3.scaleBand().domain(ageGroups).range([0, width]).padding(0.3);
-    const y = d3.scaleLinear()
-        .domain([0, d3.max(chartData, d => d.value) * 1.1 || 100])
-        .range([height, 0]);
+    
+    const y = d3.scaleLinear().domain([0, d3.max(chartData, d => d.value) * 1.1 || 100]).range([height, 0]);
 
     svg.append("g").attr("class", "grid")
         .call(d3.axisLeft(y).ticks(5).tickSize(-width).tickFormat(""))
@@ -380,7 +370,7 @@ function drawFinesAge(data) {
     svg.selectAll(".bar-label").data(chartData).enter().append("text")
         .attr("class", "bar-label")
         .attr("x", d => x(d.age) + x.bandwidth() / 2)
-        .attr("y", d => d.value > 0 ? y(d.value) - 6 : height - 6)
+        .attr("y", d => y(d.value) - 6)
         .attr("text-anchor", "middle").attr("font-size", "11px")
         .attr("fill", "#475569").attr("font-family", "DM Sans, sans-serif")
         .text(d => d.value === 0 ? "" : d.value.toLocaleString());
@@ -409,9 +399,7 @@ function drawFinesLocation(data) {
     }
 
     const margin = { top: 10, right: 160, bottom: 40, left: 200 };
-    const container = document.getElementById("fines-location-chart");
-    if (!container) return;
-    const width = Math.max(container.offsetWidth - margin.left - margin.right, 100);
+    const width = document.getElementById("fines-location-chart").offsetWidth - margin.left - margin.right;
     const height = 280 - margin.top - margin.bottom;
 
     const svg = d3.select("#fines-location-chart")
@@ -426,8 +414,6 @@ function drawFinesLocation(data) {
         .filter(loc => locMap.has(loc))
         .map(loc => ({ location: loc, value: locMap.get(loc) || 0, color: locColors[loc] }))
         .sort((a,b) => b.value - a.value);
-
-    if (chartData.length === 0) return;
 
     const x = d3.scaleLinear().domain([0, d3.max(chartData, d => d.value) * 1.1 || 100]).range([0, width]);
     const y = d3.scaleBand().domain(chartData.map(d => d.location)).range([0, height]).padding(0.3);
@@ -462,16 +448,17 @@ function drawFinesLocation(data) {
         })
         .on("mouseout", function() { d3.select(this).attr("opacity", 1); finesTooltip.style("opacity", 0); })
         .transition().duration(700).delay((d,i) => i * 100)
-        .attr("width", d => Math.max(x(d.value), 0));
+        .attr("width", d => x(d.value));
 
     svg.selectAll(".bar-label").data(chartData).enter().append("text")
         .attr("class", "bar-label")
-        .attr("x", d => Math.max(x(d.value), 0) + 8)
+        .attr("x", d => x(d.value) + 8)
         .attr("y", d => y(d.location) + y.bandwidth() / 2 + 4)
         .attr("font-size", "11px").attr("fill", "#475569")
         .attr("font-family", "DM Sans, sans-serif")
         .text(d => d.value.toLocaleString());
 
+    // Legend
     const legend = svg.append("g").attr("transform", `translate(${width + 16}, 0)`);
     chartData.forEach((d, i) => {
         const row = legend.append("g").attr("transform", `translate(0, ${i * 24})`);
@@ -481,6 +468,3 @@ function drawFinesLocation(data) {
             .text(d.location.replace(" Australia", "").replace(" of", ""));
     });
 }
-
-// Resize support
-window.addEventListener("resize", applyFinesFilters);
