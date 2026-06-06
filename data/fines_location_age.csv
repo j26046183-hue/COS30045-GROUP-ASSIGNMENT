@@ -1,129 +1,457 @@
-"STATE","LOCATION","AGE_GROUP","TOTAL FINES"
-"ACT","Major Cities of Australia","17-25",22154
-"ACT","Major Cities of Australia","26-39",50930
-"ACT","Major Cities of Australia","40-64",72160
-"ACT","Major Cities of Australia","65 and over",20149
-"ACT","Major Cities of Australia","Under 17",144
-"ACT","Major Cities of Australia","Unknown",3376
-"NSW","Inner Regional Australia","17-25",38768
-"NSW","Inner Regional Australia","26-39",59732
-"NSW","Inner Regional Australia","40-64",60305
-"NSW","Inner Regional Australia","65 and over",13756
-"NSW","Inner Regional Australia","Under 17",216
-"NSW","Major Cities of Australia","17-25",59791
-"NSW","Major Cities of Australia","26-39",68483
-"NSW","Major Cities of Australia","40-64",56309
-"NSW","Major Cities of Australia","65 and over",7754
-"NSW","Major Cities of Australia","Under 17",263
-"NSW","Major Cities of Australia","Unknown",0
-"NSW","Outer Regional Australia","17-25",9819
-"NSW","Outer Regional Australia","26-39",16575
-"NSW","Outer Regional Australia","40-64",18898
-"NSW","Outer Regional Australia","65 and over",4954
-"NSW","Outer Regional Australia","Under 17",59
-"NSW","Remote Australia","17-25",760
-"NSW","Remote Australia","26-39",1330
-"NSW","Remote Australia","40-64",1571
-"NSW","Remote Australia","65 and over",429
-"NSW","Remote Australia","Under 17",7
-"NSW","Unknown","17-25",1754
-"NSW","Unknown","26-39",2313
-"NSW","Unknown","40-64",2080
-"NSW","Unknown","65 and over",398
-"NSW","Unknown","Under 17",11
-"NSW","Unknown","Unknown",1846757
-"NSW","Very Remote Australia","17-25",100
-"NSW","Very Remote Australia","26-39",199
-"NSW","Very Remote Australia","40-64",188
-"NSW","Very Remote Australia","65 and over",44
-"NSW","Very Remote Australia","Under 17",1
-"NT","Unknown","17-25",12307
-"NT","Unknown","26-39",31560
-"NT","Unknown","40-64",38622
-"NT","Unknown","65 and over",8623
-"NT","Unknown","Under 17",121
-"NT","Unknown","Unknown",3147
-"QLD","Unknown","17-25",144916
-"QLD","Unknown","26-39",291988
-"QLD","Unknown","40-64",381210
-"QLD","Unknown","65 and over",92394
-"QLD","Unknown","Under 17",21646
-"QLD","Unknown","Unknown",1008877
-"SA","Inner Regional Australia","17-25",4332
-"SA","Inner Regional Australia","26-39",9846
-"SA","Inner Regional Australia","40-64",15245
-"SA","Inner Regional Australia","65 and over",6092
-"SA","Inner Regional Australia","Under 17",8
-"SA","Inner Regional Australia","Unknown",1237
-"SA","Major Cities of Australia","17-25",15746
-"SA","Major Cities of Australia","26-39",34214
-"SA","Major Cities of Australia","40-64",54511
-"SA","Major Cities of Australia","65 and over",17966
-"SA","Major Cities of Australia","Under 17",31
-"SA","Major Cities of Australia","Unknown",7629
-"SA","Outer Regional Australia","17-25",3189
-"SA","Outer Regional Australia","26-39",6663
-"SA","Outer Regional Australia","40-64",9411
-"SA","Outer Regional Australia","65 and over",3318
-"SA","Outer Regional Australia","Under 17",13
-"SA","Outer Regional Australia","Unknown",1000
-"SA","Remote Australia","17-25",534
-"SA","Remote Australia","26-39",1175
-"SA","Remote Australia","40-64",1494
-"SA","Remote Australia","65 and over",439
-"SA","Remote Australia","Under 17",2
-"SA","Remote Australia","Unknown",185
-"SA","Unknown","17-25",27617
-"SA","Unknown","26-39",63160
-"SA","Unknown","40-64",96195
-"SA","Unknown","65 and over",29558
-"SA","Unknown","Under 17",38
-"SA","Unknown","Unknown",4607
-"SA","Very Remote Australia","17-25",310
-"SA","Very Remote Australia","26-39",722
-"SA","Very Remote Australia","40-64",833
-"SA","Very Remote Australia","65 and over",200
-"SA","Very Remote Australia","Under 17",0
-"SA","Very Remote Australia","Unknown",120
-"TAS","Unknown","17-25",21671
-"TAS","Unknown","26-39",47289
-"TAS","Unknown","40-64",61087
-"TAS","Unknown","65 and over",21799
-"TAS","Unknown","Under 17",28
-"TAS","Unknown","Unknown",64
-"VIC","Inner Regional Australia","17-25",27058
-"VIC","Inner Regional Australia","26-39",80972
-"VIC","Inner Regional Australia","40-64",122904
-"VIC","Inner Regional Australia","65 and over",46377
-"VIC","Inner Regional Australia","Under 17",34
-"VIC","Inner Regional Australia","Unknown",44525
-"VIC","Major Cities of Australia","17-25",126146
-"VIC","Major Cities of Australia","26-39",441457
-"VIC","Major Cities of Australia","40-64",691946
-"VIC","Major Cities of Australia","65 and over",196152
-"VIC","Major Cities of Australia","Under 17",41
-"VIC","Major Cities of Australia","Unknown",271535
-"VIC","Outer Regional Australia","17-25",4104
-"VIC","Outer Regional Australia","26-39",11655
-"VIC","Outer Regional Australia","40-64",16990
-"VIC","Outer Regional Australia","65 and over",6873
-"VIC","Outer Regional Australia","Under 17",15
-"VIC","Outer Regional Australia","Unknown",4672
-"VIC","Remote Australia","17-25",42
-"VIC","Remote Australia","26-39",109
-"VIC","Remote Australia","40-64",163
-"VIC","Remote Australia","65 and over",77
-"VIC","Remote Australia","Under 17",0
-"VIC","Remote Australia","Unknown",2
-"VIC","Unknown","17-25",30509
-"VIC","Unknown","26-39",62448
-"VIC","Unknown","40-64",71149
-"VIC","Unknown","65 and over",16207
-"VIC","Unknown","Under 17",107
-"VIC","Unknown","Unknown",6429
-"WA","Unknown","17-25",156815
-"WA","Unknown","26-39",397102
-"WA","Unknown","40-64",593441
-"WA","Unknown","65 and over",146466
-"WA","Unknown","Under 17",1190
-"WA","Unknown","Unknown",373
+"STATE","LOCATION","AGE_GROUP","METRIC","TOTAL FINES"
+"ACT","Major Cities of Australia","17-25","mobile_phone_use",3737
+"ACT","Major Cities of Australia","17-25","non_wearing_seatbelts",45
+"ACT","Major Cities of Australia","17-25","speed_fines",18198
+"ACT","Major Cities of Australia","17-25","unlicensed_driving",174
+"ACT","Major Cities of Australia","26-39","mobile_phone_use",10973
+"ACT","Major Cities of Australia","26-39","non_wearing_seatbelts",42
+"ACT","Major Cities of Australia","26-39","speed_fines",39696
+"ACT","Major Cities of Australia","26-39","unlicensed_driving",219
+"ACT","Major Cities of Australia","40-64","mobile_phone_use",10666
+"ACT","Major Cities of Australia","40-64","non_wearing_seatbelts",40
+"ACT","Major Cities of Australia","40-64","speed_fines",61314
+"ACT","Major Cities of Australia","40-64","unlicensed_driving",140
+"ACT","Major Cities of Australia","65 and over","mobile_phone_use",1246
+"ACT","Major Cities of Australia","65 and over","non_wearing_seatbelts",3
+"ACT","Major Cities of Australia","65 and over","speed_fines",18896
+"ACT","Major Cities of Australia","65 and over","unlicensed_driving",4
+"ACT","Major Cities of Australia","Under 17","mobile_phone_use",17
+"ACT","Major Cities of Australia","Under 17","non_wearing_seatbelts",4
+"ACT","Major Cities of Australia","Under 17","speed_fines",101
+"ACT","Major Cities of Australia","Under 17","unlicensed_driving",22
+"ACT","Major Cities of Australia","Unknown","mobile_phone_use",774
+"ACT","Major Cities of Australia","Unknown","speed_fines",2602
+"NSW","Inner Regional Australia","17-25","mobile_phone_use",1100
+"NSW","Inner Regional Australia","17-25","non_wearing_seatbelts",1559
+"NSW","Inner Regional Australia","17-25","speed_fines",35193
+"NSW","Inner Regional Australia","17-25","unlicensed_driving",916
+"NSW","Inner Regional Australia","26-39","mobile_phone_use",1361
+"NSW","Inner Regional Australia","26-39","non_wearing_seatbelts",2489
+"NSW","Inner Regional Australia","26-39","speed_fines",53859
+"NSW","Inner Regional Australia","26-39","unlicensed_driving",2023
+"NSW","Inner Regional Australia","40-64","mobile_phone_use",984
+"NSW","Inner Regional Australia","40-64","non_wearing_seatbelts",1610
+"NSW","Inner Regional Australia","40-64","speed_fines",56326
+"NSW","Inner Regional Australia","40-64","unlicensed_driving",1385
+"NSW","Inner Regional Australia","65 and over","mobile_phone_use",129
+"NSW","Inner Regional Australia","65 and over","non_wearing_seatbelts",366
+"NSW","Inner Regional Australia","65 and over","speed_fines",13107
+"NSW","Inner Regional Australia","65 and over","unlicensed_driving",154
+"NSW","Inner Regional Australia","Under 17","mobile_phone_use",14
+"NSW","Inner Regional Australia","Under 17","non_wearing_seatbelts",38
+"NSW","Inner Regional Australia","Under 17","speed_fines",130
+"NSW","Inner Regional Australia","Under 17","unlicensed_driving",34
+"NSW","Major Cities of Australia","17-25","mobile_phone_use",8035
+"NSW","Major Cities of Australia","17-25","non_wearing_seatbelts",2641
+"NSW","Major Cities of Australia","17-25","speed_fines",45648
+"NSW","Major Cities of Australia","17-25","unlicensed_driving",3467
+"NSW","Major Cities of Australia","26-39","mobile_phone_use",8585
+"NSW","Major Cities of Australia","26-39","non_wearing_seatbelts",4189
+"NSW","Major Cities of Australia","26-39","speed_fines",51080
+"NSW","Major Cities of Australia","26-39","unlicensed_driving",4629
+"NSW","Major Cities of Australia","40-64","mobile_phone_use",6059
+"NSW","Major Cities of Australia","40-64","non_wearing_seatbelts",2796
+"NSW","Major Cities of Australia","40-64","speed_fines",44885
+"NSW","Major Cities of Australia","40-64","unlicensed_driving",2569
+"NSW","Major Cities of Australia","65 and over","mobile_phone_use",633
+"NSW","Major Cities of Australia","65 and over","non_wearing_seatbelts",439
+"NSW","Major Cities of Australia","65 and over","speed_fines",6486
+"NSW","Major Cities of Australia","65 and over","unlicensed_driving",196
+"NSW","Major Cities of Australia","Under 17","mobile_phone_use",25
+"NSW","Major Cities of Australia","Under 17","non_wearing_seatbelts",57
+"NSW","Major Cities of Australia","Under 17","speed_fines",120
+"NSW","Major Cities of Australia","Under 17","unlicensed_driving",61
+"NSW","Major Cities of Australia","Unknown","unlicensed_driving",0
+"NSW","Outer Regional Australia","17-25","mobile_phone_use",161
+"NSW","Outer Regional Australia","17-25","non_wearing_seatbelts",471
+"NSW","Outer Regional Australia","17-25","speed_fines",8929
+"NSW","Outer Regional Australia","17-25","unlicensed_driving",258
+"NSW","Outer Regional Australia","26-39","mobile_phone_use",218
+"NSW","Outer Regional Australia","26-39","non_wearing_seatbelts",826
+"NSW","Outer Regional Australia","26-39","speed_fines",14947
+"NSW","Outer Regional Australia","26-39","unlicensed_driving",584
+"NSW","Outer Regional Australia","40-64","mobile_phone_use",192
+"NSW","Outer Regional Australia","40-64","non_wearing_seatbelts",659
+"NSW","Outer Regional Australia","40-64","speed_fines",17659
+"NSW","Outer Regional Australia","40-64","unlicensed_driving",388
+"NSW","Outer Regional Australia","65 and over","mobile_phone_use",26
+"NSW","Outer Regional Australia","65 and over","non_wearing_seatbelts",166
+"NSW","Outer Regional Australia","65 and over","speed_fines",4714
+"NSW","Outer Regional Australia","65 and over","unlicensed_driving",48
+"NSW","Outer Regional Australia","Under 17","mobile_phone_use",1
+"NSW","Outer Regional Australia","Under 17","non_wearing_seatbelts",15
+"NSW","Outer Regional Australia","Under 17","speed_fines",31
+"NSW","Outer Regional Australia","Under 17","unlicensed_driving",12
+"NSW","Remote Australia","17-25","mobile_phone_use",9
+"NSW","Remote Australia","17-25","non_wearing_seatbelts",52
+"NSW","Remote Australia","17-25","speed_fines",675
+"NSW","Remote Australia","17-25","unlicensed_driving",24
+"NSW","Remote Australia","26-39","mobile_phone_use",15
+"NSW","Remote Australia","26-39","non_wearing_seatbelts",78
+"NSW","Remote Australia","26-39","speed_fines",1186
+"NSW","Remote Australia","26-39","unlicensed_driving",51
+"NSW","Remote Australia","40-64","mobile_phone_use",7
+"NSW","Remote Australia","40-64","non_wearing_seatbelts",87
+"NSW","Remote Australia","40-64","speed_fines",1445
+"NSW","Remote Australia","40-64","unlicensed_driving",32
+"NSW","Remote Australia","65 and over","mobile_phone_use",3
+"NSW","Remote Australia","65 and over","non_wearing_seatbelts",18
+"NSW","Remote Australia","65 and over","speed_fines",404
+"NSW","Remote Australia","65 and over","unlicensed_driving",4
+"NSW","Remote Australia","Under 17","speed_fines",3
+"NSW","Remote Australia","Under 17","unlicensed_driving",4
+"NSW","Unknown","17-25","mobile_phone_use",161
+"NSW","Unknown","17-25","non_wearing_seatbelts",120
+"NSW","Unknown","17-25","speed_fines",1383
+"NSW","Unknown","17-25","unlicensed_driving",90
+"NSW","Unknown","26-39","mobile_phone_use",176
+"NSW","Unknown","26-39","non_wearing_seatbelts",208
+"NSW","Unknown","26-39","speed_fines",1765
+"NSW","Unknown","26-39","unlicensed_driving",164
+"NSW","Unknown","40-64","mobile_phone_use",99
+"NSW","Unknown","40-64","non_wearing_seatbelts",152
+"NSW","Unknown","40-64","speed_fines",1748
+"NSW","Unknown","40-64","unlicensed_driving",81
+"NSW","Unknown","65 and over","mobile_phone_use",9
+"NSW","Unknown","65 and over","non_wearing_seatbelts",28
+"NSW","Unknown","65 and over","speed_fines",353
+"NSW","Unknown","65 and over","unlicensed_driving",8
+"NSW","Unknown","Under 17","speed_fines",6
+"NSW","Unknown","Under 17","unlicensed_driving",5
+"NSW","Unknown","Unknown","mobile_phone_use",350029
+"NSW","Unknown","Unknown","non_wearing_seatbelts",72088
+"NSW","Unknown","Unknown","speed_fines",1424640
+"NSW","Very Remote Australia","17-25","mobile_phone_use",2
+"NSW","Very Remote Australia","17-25","non_wearing_seatbelts",17
+"NSW","Very Remote Australia","17-25","speed_fines",77
+"NSW","Very Remote Australia","17-25","unlicensed_driving",4
+"NSW","Very Remote Australia","26-39","mobile_phone_use",3
+"NSW","Very Remote Australia","26-39","non_wearing_seatbelts",33
+"NSW","Very Remote Australia","26-39","speed_fines",150
+"NSW","Very Remote Australia","26-39","unlicensed_driving",13
+"NSW","Very Remote Australia","40-64","mobile_phone_use",3
+"NSW","Very Remote Australia","40-64","non_wearing_seatbelts",13
+"NSW","Very Remote Australia","40-64","speed_fines",162
+"NSW","Very Remote Australia","40-64","unlicensed_driving",10
+"NSW","Very Remote Australia","65 and over","non_wearing_seatbelts",1
+"NSW","Very Remote Australia","65 and over","speed_fines",43
+"NSW","Very Remote Australia","65 and over","unlicensed_driving",0
+"NSW","Very Remote Australia","Under 17","speed_fines",1
+"NSW","Very Remote Australia","Under 17","unlicensed_driving",0
+"NT","Unknown","17-25","mobile_phone_use",86
+"NT","Unknown","17-25","non_wearing_seatbelts",348
+"NT","Unknown","17-25","speed_fines",11691
+"NT","Unknown","17-25","unlicensed_driving",182
+"NT","Unknown","26-39","mobile_phone_use",202
+"NT","Unknown","26-39","non_wearing_seatbelts",772
+"NT","Unknown","26-39","speed_fines",30187
+"NT","Unknown","26-39","unlicensed_driving",399
+"NT","Unknown","40-64","mobile_phone_use",142
+"NT","Unknown","40-64","non_wearing_seatbelts",595
+"NT","Unknown","40-64","speed_fines",37682
+"NT","Unknown","40-64","unlicensed_driving",203
+"NT","Unknown","65 and over","mobile_phone_use",18
+"NT","Unknown","65 and over","non_wearing_seatbelts",56
+"NT","Unknown","65 and over","speed_fines",8538
+"NT","Unknown","65 and over","unlicensed_driving",11
+"NT","Unknown","Under 17","mobile_phone_use",1
+"NT","Unknown","Under 17","non_wearing_seatbelts",2
+"NT","Unknown","Under 17","speed_fines",116
+"NT","Unknown","Under 17","unlicensed_driving",2
+"NT","Unknown","Unknown","speed_fines",3147
+"QLD","Unknown","17-25","mobile_phone_use",10451
+"QLD","Unknown","17-25","non_wearing_seatbelts",5870
+"QLD","Unknown","17-25","speed_fines",121629
+"QLD","Unknown","17-25","unlicensed_driving",6966
+"QLD","Unknown","26-39","mobile_phone_use",29198
+"QLD","Unknown","26-39","non_wearing_seatbelts",14890
+"QLD","Unknown","26-39","speed_fines",237465
+"QLD","Unknown","26-39","unlicensed_driving",10435
+"QLD","Unknown","40-64","mobile_phone_use",29490
+"QLD","Unknown","40-64","non_wearing_seatbelts",14567
+"QLD","Unknown","40-64","speed_fines",330434
+"QLD","Unknown","40-64","unlicensed_driving",6719
+"QLD","Unknown","65 and over","mobile_phone_use",3789
+"QLD","Unknown","65 and over","non_wearing_seatbelts",3209
+"QLD","Unknown","65 and over","speed_fines",84968
+"QLD","Unknown","65 and over","unlicensed_driving",428
+"QLD","Unknown","Under 17","mobile_phone_use",2104
+"QLD","Unknown","Under 17","non_wearing_seatbelts",812
+"QLD","Unknown","Under 17","speed_fines",18147
+"QLD","Unknown","Under 17","unlicensed_driving",583
+"QLD","Unknown","Unknown","mobile_phone_use",80594
+"QLD","Unknown","Unknown","non_wearing_seatbelts",37712
+"QLD","Unknown","Unknown","speed_fines",862866
+"QLD","Unknown","Unknown","unlicensed_driving",27705
+"SA","Inner Regional Australia","17-25","mobile_phone_use",34
+"SA","Inner Regional Australia","17-25","non_wearing_seatbelts",51
+"SA","Inner Regional Australia","17-25","speed_fines",4247
+"SA","Inner Regional Australia","26-39","mobile_phone_use",74
+"SA","Inner Regional Australia","26-39","non_wearing_seatbelts",84
+"SA","Inner Regional Australia","26-39","speed_fines",9688
+"SA","Inner Regional Australia","40-64","mobile_phone_use",67
+"SA","Inner Regional Australia","40-64","non_wearing_seatbelts",133
+"SA","Inner Regional Australia","40-64","speed_fines",15045
+"SA","Inner Regional Australia","65 and over","mobile_phone_use",12
+"SA","Inner Regional Australia","65 and over","non_wearing_seatbelts",74
+"SA","Inner Regional Australia","65 and over","speed_fines",5984
+"SA","Inner Regional Australia","65 and over","unlicensed_driving",22
+"SA","Inner Regional Australia","Under 17","mobile_phone_use",1
+"SA","Inner Regional Australia","Under 17","non_wearing_seatbelts",2
+"SA","Inner Regional Australia","Under 17","speed_fines",5
+"SA","Inner Regional Australia","Unknown","speed_fines",619
+"SA","Inner Regional Australia","Unknown","unlicensed_driving",618
+"SA","Major Cities of Australia","17-25","mobile_phone_use",1024
+"SA","Major Cities of Australia","17-25","non_wearing_seatbelts",235
+"SA","Major Cities of Australia","17-25","speed_fines",14487
+"SA","Major Cities of Australia","26-39","mobile_phone_use",1575
+"SA","Major Cities of Australia","26-39","non_wearing_seatbelts",416
+"SA","Major Cities of Australia","26-39","speed_fines",32223
+"SA","Major Cities of Australia","40-64","mobile_phone_use",1280
+"SA","Major Cities of Australia","40-64","non_wearing_seatbelts",510
+"SA","Major Cities of Australia","40-64","speed_fines",52721
+"SA","Major Cities of Australia","65 and over","mobile_phone_use",171
+"SA","Major Cities of Australia","65 and over","non_wearing_seatbelts",169
+"SA","Major Cities of Australia","65 and over","speed_fines",17503
+"SA","Major Cities of Australia","65 and over","unlicensed_driving",123
+"SA","Major Cities of Australia","Under 17","mobile_phone_use",1
+"SA","Major Cities of Australia","Under 17","non_wearing_seatbelts",11
+"SA","Major Cities of Australia","Under 17","speed_fines",19
+"SA","Major Cities of Australia","Unknown","mobile_phone_use",4
+"SA","Major Cities of Australia","Unknown","speed_fines",3117
+"SA","Major Cities of Australia","Unknown","unlicensed_driving",4508
+"SA","Outer Regional Australia","17-25","mobile_phone_use",49
+"SA","Outer Regional Australia","17-25","non_wearing_seatbelts",106
+"SA","Outer Regional Australia","17-25","speed_fines",3034
+"SA","Outer Regional Australia","26-39","mobile_phone_use",79
+"SA","Outer Regional Australia","26-39","non_wearing_seatbelts",157
+"SA","Outer Regional Australia","26-39","speed_fines",6427
+"SA","Outer Regional Australia","40-64","mobile_phone_use",86
+"SA","Outer Regional Australia","40-64","non_wearing_seatbelts",162
+"SA","Outer Regional Australia","40-64","speed_fines",9163
+"SA","Outer Regional Australia","65 and over","mobile_phone_use",8
+"SA","Outer Regional Australia","65 and over","non_wearing_seatbelts",92
+"SA","Outer Regional Australia","65 and over","speed_fines",3163
+"SA","Outer Regional Australia","65 and over","unlicensed_driving",55
+"SA","Outer Regional Australia","Under 17","non_wearing_seatbelts",2
+"SA","Outer Regional Australia","Under 17","speed_fines",11
+"SA","Outer Regional Australia","Unknown","speed_fines",171
+"SA","Outer Regional Australia","Unknown","unlicensed_driving",829
+"SA","Remote Australia","17-25","mobile_phone_use",7
+"SA","Remote Australia","17-25","non_wearing_seatbelts",17
+"SA","Remote Australia","17-25","speed_fines",510
+"SA","Remote Australia","26-39","mobile_phone_use",16
+"SA","Remote Australia","26-39","non_wearing_seatbelts",31
+"SA","Remote Australia","26-39","speed_fines",1128
+"SA","Remote Australia","40-64","mobile_phone_use",16
+"SA","Remote Australia","40-64","non_wearing_seatbelts",35
+"SA","Remote Australia","40-64","speed_fines",1443
+"SA","Remote Australia","65 and over","mobile_phone_use",3
+"SA","Remote Australia","65 and over","non_wearing_seatbelts",19
+"SA","Remote Australia","65 and over","speed_fines",407
+"SA","Remote Australia","65 and over","unlicensed_driving",10
+"SA","Remote Australia","Under 17","speed_fines",2
+"SA","Remote Australia","Unknown","speed_fines",15
+"SA","Remote Australia","Unknown","unlicensed_driving",170
+"SA","Unknown","17-25","mobile_phone_use",1406
+"SA","Unknown","17-25","non_wearing_seatbelts",493
+"SA","Unknown","17-25","speed_fines",24634
+"SA","Unknown","17-25","unlicensed_driving",1084
+"SA","Unknown","26-39","mobile_phone_use",2298
+"SA","Unknown","26-39","non_wearing_seatbelts",946
+"SA","Unknown","26-39","speed_fines",56830
+"SA","Unknown","26-39","unlicensed_driving",3086
+"SA","Unknown","40-64","mobile_phone_use",1830
+"SA","Unknown","40-64","non_wearing_seatbelts",1060
+"SA","Unknown","40-64","speed_fines",90662
+"SA","Unknown","40-64","unlicensed_driving",2643
+"SA","Unknown","65 and over","mobile_phone_use",305
+"SA","Unknown","65 and over","non_wearing_seatbelts",418
+"SA","Unknown","65 and over","speed_fines",28586
+"SA","Unknown","65 and over","unlicensed_driving",249
+"SA","Unknown","Under 17","mobile_phone_use",3
+"SA","Unknown","Under 17","non_wearing_seatbelts",11
+"SA","Unknown","Under 17","speed_fines",21
+"SA","Unknown","Under 17","unlicensed_driving",3
+"SA","Unknown","Unknown","mobile_phone_use",0
+"SA","Unknown","Unknown","non_wearing_seatbelts",0
+"SA","Unknown","Unknown","speed_fines",4451
+"SA","Unknown","Unknown","unlicensed_driving",156
+"SA","Very Remote Australia","17-25","mobile_phone_use",6
+"SA","Very Remote Australia","17-25","non_wearing_seatbelts",22
+"SA","Very Remote Australia","17-25","speed_fines",282
+"SA","Very Remote Australia","26-39","mobile_phone_use",8
+"SA","Very Remote Australia","26-39","non_wearing_seatbelts",72
+"SA","Very Remote Australia","26-39","speed_fines",642
+"SA","Very Remote Australia","40-64","mobile_phone_use",9
+"SA","Very Remote Australia","40-64","non_wearing_seatbelts",62
+"SA","Very Remote Australia","40-64","speed_fines",762
+"SA","Very Remote Australia","65 and over","mobile_phone_use",2
+"SA","Very Remote Australia","65 and over","non_wearing_seatbelts",16
+"SA","Very Remote Australia","65 and over","speed_fines",178
+"SA","Very Remote Australia","65 and over","unlicensed_driving",4
+"SA","Very Remote Australia","Under 17","speed_fines",0
+"SA","Very Remote Australia","Unknown","speed_fines",3
+"SA","Very Remote Australia","Unknown","unlicensed_driving",117
+"TAS","Unknown","17-25","mobile_phone_use",933
+"TAS","Unknown","17-25","non_wearing_seatbelts",855
+"TAS","Unknown","17-25","speed_fines",19804
+"TAS","Unknown","17-25","unlicensed_driving",79
+"TAS","Unknown","26-39","mobile_phone_use",2137
+"TAS","Unknown","26-39","non_wearing_seatbelts",2033
+"TAS","Unknown","26-39","speed_fines",42901
+"TAS","Unknown","26-39","unlicensed_driving",218
+"TAS","Unknown","40-64","mobile_phone_use",1862
+"TAS","Unknown","40-64","non_wearing_seatbelts",2236
+"TAS","Unknown","40-64","speed_fines",56810
+"TAS","Unknown","40-64","unlicensed_driving",179
+"TAS","Unknown","65 and over","mobile_phone_use",311
+"TAS","Unknown","65 and over","non_wearing_seatbelts",1042
+"TAS","Unknown","65 and over","speed_fines",20436
+"TAS","Unknown","65 and over","unlicensed_driving",10
+"TAS","Unknown","Under 17","mobile_phone_use",0
+"TAS","Unknown","Under 17","non_wearing_seatbelts",2
+"TAS","Unknown","Under 17","speed_fines",26
+"TAS","Unknown","Under 17","unlicensed_driving",0
+"TAS","Unknown","Unknown","non_wearing_seatbelts",7
+"TAS","Unknown","Unknown","speed_fines",56
+"TAS","Unknown","Unknown","unlicensed_driving",1
+"VIC","Inner Regional Australia","17-25","mobile_phone_use",908
+"VIC","Inner Regional Australia","17-25","non_wearing_seatbelts",1003
+"VIC","Inner Regional Australia","17-25","speed_fines",24769
+"VIC","Inner Regional Australia","17-25","unlicensed_driving",378
+"VIC","Inner Regional Australia","26-39","mobile_phone_use",2915
+"VIC","Inner Regional Australia","26-39","non_wearing_seatbelts",2664
+"VIC","Inner Regional Australia","26-39","speed_fines",74305
+"VIC","Inner Regional Australia","26-39","unlicensed_driving",1088
+"VIC","Inner Regional Australia","40-64","mobile_phone_use",3476
+"VIC","Inner Regional Australia","40-64","non_wearing_seatbelts",3568
+"VIC","Inner Regional Australia","40-64","speed_fines",115099
+"VIC","Inner Regional Australia","40-64","unlicensed_driving",761
+"VIC","Inner Regional Australia","65 and over","mobile_phone_use",577
+"VIC","Inner Regional Australia","65 and over","non_wearing_seatbelts",1394
+"VIC","Inner Regional Australia","65 and over","speed_fines",44339
+"VIC","Inner Regional Australia","65 and over","unlicensed_driving",67
+"VIC","Inner Regional Australia","Under 17","mobile_phone_use",2
+"VIC","Inner Regional Australia","Under 17","non_wearing_seatbelts",4
+"VIC","Inner Regional Australia","Under 17","speed_fines",8
+"VIC","Inner Regional Australia","Under 17","unlicensed_driving",20
+"VIC","Inner Regional Australia","Unknown","mobile_phone_use",2871
+"VIC","Inner Regional Australia","Unknown","non_wearing_seatbelts",5824
+"VIC","Inner Regional Australia","Unknown","speed_fines",35825
+"VIC","Inner Regional Australia","Unknown","unlicensed_driving",5
+"VIC","Major Cities of Australia","17-25","mobile_phone_use",5760
+"VIC","Major Cities of Australia","17-25","non_wearing_seatbelts",3846
+"VIC","Major Cities of Australia","17-25","speed_fines",115102
+"VIC","Major Cities of Australia","17-25","unlicensed_driving",1438
+"VIC","Major Cities of Australia","26-39","mobile_phone_use",21382
+"VIC","Major Cities of Australia","26-39","non_wearing_seatbelts",15103
+"VIC","Major Cities of Australia","26-39","speed_fines",401911
+"VIC","Major Cities of Australia","26-39","unlicensed_driving",3061
+"VIC","Major Cities of Australia","40-64","mobile_phone_use",23002
+"VIC","Major Cities of Australia","40-64","non_wearing_seatbelts",19182
+"VIC","Major Cities of Australia","40-64","speed_fines",648223
+"VIC","Major Cities of Australia","40-64","unlicensed_driving",1539
+"VIC","Major Cities of Australia","65 and over","mobile_phone_use",3376
+"VIC","Major Cities of Australia","65 and over","non_wearing_seatbelts",5218
+"VIC","Major Cities of Australia","65 and over","speed_fines",187424
+"VIC","Major Cities of Australia","65 and over","unlicensed_driving",134
+"VIC","Major Cities of Australia","Under 17","mobile_phone_use",4
+"VIC","Major Cities of Australia","Under 17","non_wearing_seatbelts",6
+"VIC","Major Cities of Australia","Under 17","speed_fines",7
+"VIC","Major Cities of Australia","Under 17","unlicensed_driving",24
+"VIC","Major Cities of Australia","Unknown","mobile_phone_use",25496
+"VIC","Major Cities of Australia","Unknown","non_wearing_seatbelts",19477
+"VIC","Major Cities of Australia","Unknown","speed_fines",226548
+"VIC","Major Cities of Australia","Unknown","unlicensed_driving",14
+"VIC","Outer Regional Australia","17-25","mobile_phone_use",108
+"VIC","Outer Regional Australia","17-25","non_wearing_seatbelts",154
+"VIC","Outer Regional Australia","17-25","speed_fines",3732
+"VIC","Outer Regional Australia","17-25","unlicensed_driving",110
+"VIC","Outer Regional Australia","26-39","mobile_phone_use",276
+"VIC","Outer Regional Australia","26-39","non_wearing_seatbelts",361
+"VIC","Outer Regional Australia","26-39","speed_fines",10702
+"VIC","Outer Regional Australia","26-39","unlicensed_driving",316
+"VIC","Outer Regional Australia","40-64","mobile_phone_use",240
+"VIC","Outer Regional Australia","40-64","non_wearing_seatbelts",414
+"VIC","Outer Regional Australia","40-64","speed_fines",16132
+"VIC","Outer Regional Australia","40-64","unlicensed_driving",204
+"VIC","Outer Regional Australia","65 and over","mobile_phone_use",44
+"VIC","Outer Regional Australia","65 and over","non_wearing_seatbelts",189
+"VIC","Outer Regional Australia","65 and over","speed_fines",6618
+"VIC","Outer Regional Australia","65 and over","unlicensed_driving",22
+"VIC","Outer Regional Australia","Under 17","mobile_phone_use",0
+"VIC","Outer Regional Australia","Under 17","non_wearing_seatbelts",3
+"VIC","Outer Regional Australia","Under 17","speed_fines",2
+"VIC","Outer Regional Australia","Under 17","unlicensed_driving",10
+"VIC","Outer Regional Australia","Unknown","mobile_phone_use",124
+"VIC","Outer Regional Australia","Unknown","non_wearing_seatbelts",196
+"VIC","Outer Regional Australia","Unknown","speed_fines",4350
+"VIC","Outer Regional Australia","Unknown","unlicensed_driving",2
+"VIC","Remote Australia","17-25","mobile_phone_use",0
+"VIC","Remote Australia","17-25","non_wearing_seatbelts",1
+"VIC","Remote Australia","17-25","speed_fines",41
+"VIC","Remote Australia","26-39","mobile_phone_use",0
+"VIC","Remote Australia","26-39","non_wearing_seatbelts",3
+"VIC","Remote Australia","26-39","speed_fines",103
+"VIC","Remote Australia","26-39","unlicensed_driving",3
+"VIC","Remote Australia","40-64","mobile_phone_use",0
+"VIC","Remote Australia","40-64","non_wearing_seatbelts",3
+"VIC","Remote Australia","40-64","speed_fines",157
+"VIC","Remote Australia","40-64","unlicensed_driving",3
+"VIC","Remote Australia","65 and over","mobile_phone_use",0
+"VIC","Remote Australia","65 and over","non_wearing_seatbelts",3
+"VIC","Remote Australia","65 and over","speed_fines",74
+"VIC","Remote Australia","Under 17","mobile_phone_use",0
+"VIC","Remote Australia","Under 17","non_wearing_seatbelts",0
+"VIC","Remote Australia","Under 17","speed_fines",0
+"VIC","Remote Australia","Unknown","mobile_phone_use",0
+"VIC","Remote Australia","Unknown","non_wearing_seatbelts",0
+"VIC","Remote Australia","Unknown","speed_fines",2
+"VIC","Unknown","17-25","mobile_phone_use",2356
+"VIC","Unknown","17-25","non_wearing_seatbelts",783
+"VIC","Unknown","17-25","speed_fines",25612
+"VIC","Unknown","17-25","unlicensed_driving",1758
+"VIC","Unknown","26-39","mobile_phone_use",5689
+"VIC","Unknown","26-39","non_wearing_seatbelts",1758
+"VIC","Unknown","26-39","speed_fines",51694
+"VIC","Unknown","26-39","unlicensed_driving",3307
+"VIC","Unknown","40-64","mobile_phone_use",4573
+"VIC","Unknown","40-64","non_wearing_seatbelts",1419
+"VIC","Unknown","40-64","speed_fines",63304
+"VIC","Unknown","40-64","unlicensed_driving",1853
+"VIC","Unknown","65 and over","mobile_phone_use",543
+"VIC","Unknown","65 and over","non_wearing_seatbelts",314
+"VIC","Unknown","65 and over","speed_fines",15157
+"VIC","Unknown","65 and over","unlicensed_driving",193
+"VIC","Unknown","Under 17","mobile_phone_use",7
+"VIC","Unknown","Under 17","non_wearing_seatbelts",9
+"VIC","Unknown","Under 17","speed_fines",29
+"VIC","Unknown","Under 17","unlicensed_driving",62
+"VIC","Unknown","Unknown","mobile_phone_use",892
+"VIC","Unknown","Unknown","non_wearing_seatbelts",705
+"VIC","Unknown","Unknown","speed_fines",4829
+"VIC","Unknown","Unknown","unlicensed_driving",3
+"WA","Unknown","17-25","mobile_phone_use",1510
+"WA","Unknown","17-25","non_wearing_seatbelts",909
+"WA","Unknown","17-25","speed_fines",153501
+"WA","Unknown","17-25","unlicensed_driving",895
+"WA","Unknown","26-39","mobile_phone_use",3167
+"WA","Unknown","26-39","non_wearing_seatbelts",1517
+"WA","Unknown","26-39","speed_fines",390677
+"WA","Unknown","26-39","unlicensed_driving",1741
+"WA","Unknown","40-64","mobile_phone_use",2365
+"WA","Unknown","40-64","non_wearing_seatbelts",1071
+"WA","Unknown","40-64","speed_fines",588767
+"WA","Unknown","40-64","unlicensed_driving",1238
+"WA","Unknown","65 and over","mobile_phone_use",280
+"WA","Unknown","65 and over","non_wearing_seatbelts",215
+"WA","Unknown","65 and over","speed_fines",145816
+"WA","Unknown","65 and over","unlicensed_driving",155
+"WA","Unknown","Under 17","mobile_phone_use",1
+"WA","Unknown","Under 17","non_wearing_seatbelts",2
+"WA","Unknown","Under 17","speed_fines",1187
+"WA","Unknown","Under 17","unlicensed_driving",0
+"WA","Unknown","Unknown","non_wearing_seatbelts",1
+"WA","Unknown","Unknown","speed_fines",372
+"WA","Unknown","Unknown","unlicensed_driving",0

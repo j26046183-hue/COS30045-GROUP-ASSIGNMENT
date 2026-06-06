@@ -1,0 +1,129 @@
+"STATE","LOCATION","AGE_GROUP","TOTAL FINES"
+"ACT","Major Cities of Australia","17-25",22154
+"ACT","Major Cities of Australia","26-39",50930
+"ACT","Major Cities of Australia","40-64",72160
+"ACT","Major Cities of Australia","65 and over",20149
+"ACT","Major Cities of Australia","Under 17",144
+"ACT","Major Cities of Australia","Unknown",3376
+"NSW","Inner Regional Australia","17-25",38768
+"NSW","Inner Regional Australia","26-39",59732
+"NSW","Inner Regional Australia","40-64",60305
+"NSW","Inner Regional Australia","65 and over",13756
+"NSW","Inner Regional Australia","Under 17",216
+"NSW","Major Cities of Australia","17-25",59791
+"NSW","Major Cities of Australia","26-39",68483
+"NSW","Major Cities of Australia","40-64",56309
+"NSW","Major Cities of Australia","65 and over",7754
+"NSW","Major Cities of Australia","Under 17",263
+"NSW","Major Cities of Australia","Unknown",0
+"NSW","Outer Regional Australia","17-25",9819
+"NSW","Outer Regional Australia","26-39",16575
+"NSW","Outer Regional Australia","40-64",18898
+"NSW","Outer Regional Australia","65 and over",4954
+"NSW","Outer Regional Australia","Under 17",59
+"NSW","Remote Australia","17-25",760
+"NSW","Remote Australia","26-39",1330
+"NSW","Remote Australia","40-64",1571
+"NSW","Remote Australia","65 and over",429
+"NSW","Remote Australia","Under 17",7
+"NSW","Unknown","17-25",1754
+"NSW","Unknown","26-39",2313
+"NSW","Unknown","40-64",2080
+"NSW","Unknown","65 and over",398
+"NSW","Unknown","Under 17",11
+"NSW","Unknown","Unknown",1846757
+"NSW","Very Remote Australia","17-25",100
+"NSW","Very Remote Australia","26-39",199
+"NSW","Very Remote Australia","40-64",188
+"NSW","Very Remote Australia","65 and over",44
+"NSW","Very Remote Australia","Under 17",1
+"NT","Unknown","17-25",12307
+"NT","Unknown","26-39",31560
+"NT","Unknown","40-64",38622
+"NT","Unknown","65 and over",8623
+"NT","Unknown","Under 17",121
+"NT","Unknown","Unknown",3147
+"QLD","Unknown","17-25",144916
+"QLD","Unknown","26-39",291988
+"QLD","Unknown","40-64",381210
+"QLD","Unknown","65 and over",92394
+"QLD","Unknown","Under 17",21646
+"QLD","Unknown","Unknown",1008877
+"SA","Inner Regional Australia","17-25",4332
+"SA","Inner Regional Australia","26-39",9846
+"SA","Inner Regional Australia","40-64",15245
+"SA","Inner Regional Australia","65 and over",6092
+"SA","Inner Regional Australia","Under 17",8
+"SA","Inner Regional Australia","Unknown",1237
+"SA","Major Cities of Australia","17-25",15746
+"SA","Major Cities of Australia","26-39",34214
+"SA","Major Cities of Australia","40-64",54511
+"SA","Major Cities of Australia","65 and over",17966
+"SA","Major Cities of Australia","Under 17",31
+"SA","Major Cities of Australia","Unknown",7629
+"SA","Outer Regional Australia","17-25",3189
+"SA","Outer Regional Australia","26-39",6663
+"SA","Outer Regional Australia","40-64",9411
+"SA","Outer Regional Australia","65 and over",3318
+"SA","Outer Regional Australia","Under 17",13
+"SA","Outer Regional Australia","Unknown",1000
+"SA","Remote Australia","17-25",534
+"SA","Remote Australia","26-39",1175
+"SA","Remote Australia","40-64",1494
+"SA","Remote Australia","65 and over",439
+"SA","Remote Australia","Under 17",2
+"SA","Remote Australia","Unknown",185
+"SA","Unknown","17-25",27617
+"SA","Unknown","26-39",63160
+"SA","Unknown","40-64",96195
+"SA","Unknown","65 and over",29558
+"SA","Unknown","Under 17",38
+"SA","Unknown","Unknown",4607
+"SA","Very Remote Australia","17-25",310
+"SA","Very Remote Australia","26-39",722
+"SA","Very Remote Australia","40-64",833
+"SA","Very Remote Australia","65 and over",200
+"SA","Very Remote Australia","Under 17",0
+"SA","Very Remote Australia","Unknown",120
+"TAS","Unknown","17-25",21671
+"TAS","Unknown","26-39",47289
+"TAS","Unknown","40-64",61087
+"TAS","Unknown","65 and over",21799
+"TAS","Unknown","Under 17",28
+"TAS","Unknown","Unknown",64
+"VIC","Inner Regional Australia","17-25",27058
+"VIC","Inner Regional Australia","26-39",80972
+"VIC","Inner Regional Australia","40-64",122904
+"VIC","Inner Regional Australia","65 and over",46377
+"VIC","Inner Regional Australia","Under 17",34
+"VIC","Inner Regional Australia","Unknown",44525
+"VIC","Major Cities of Australia","17-25",126146
+"VIC","Major Cities of Australia","26-39",441457
+"VIC","Major Cities of Australia","40-64",691946
+"VIC","Major Cities of Australia","65 and over",196152
+"VIC","Major Cities of Australia","Under 17",41
+"VIC","Major Cities of Australia","Unknown",271535
+"VIC","Outer Regional Australia","17-25",4104
+"VIC","Outer Regional Australia","26-39",11655
+"VIC","Outer Regional Australia","40-64",16990
+"VIC","Outer Regional Australia","65 and over",6873
+"VIC","Outer Regional Australia","Under 17",15
+"VIC","Outer Regional Australia","Unknown",4672
+"VIC","Remote Australia","17-25",42
+"VIC","Remote Australia","26-39",109
+"VIC","Remote Australia","40-64",163
+"VIC","Remote Australia","65 and over",77
+"VIC","Remote Australia","Under 17",0
+"VIC","Remote Australia","Unknown",2
+"VIC","Unknown","17-25",30509
+"VIC","Unknown","26-39",62448
+"VIC","Unknown","40-64",71149
+"VIC","Unknown","65 and over",16207
+"VIC","Unknown","Under 17",107
+"VIC","Unknown","Unknown",6429
+"WA","Unknown","17-25",156815
+"WA","Unknown","26-39",397102
+"WA","Unknown","40-64",593441
+"WA","Unknown","65 and over",146466
+"WA","Unknown","Under 17",1190
+"WA","Unknown","Unknown",373
