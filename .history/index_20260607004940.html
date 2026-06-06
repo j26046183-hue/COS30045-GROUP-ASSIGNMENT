@@ -10,6 +10,7 @@
 </head>
 <body>
 
+    <!-- NAVBAR -->
     <nav id="navbar">
         <div class="nav-brand">
             <span class="brand-dot"></span>
@@ -23,15 +24,19 @@
         </ul>
     </nav>
 
+    <!-- ===================== HOME PAGE ===================== -->
     <div id="page-home" class="page active">
 
+        <!-- Hero -->
         <div class="home-hero">
 
+            <!-- LEFT SIDE — Title + Description + Key Facts -->
             <div class="home-hero-left">
                 <div class="hero-badge">BITRE · 2008–2024 · 8 States & Territories</div>
                 <h1>Australian Road Safety<br><span class="highlight">Enforcement</span> Dashboard</h1>
                 <p>An interactive data visualisation of road safety enforcement across Australia — covering fines, drug testing, breath testing and more. Built using data published by the Bureau of Infrastructure and Transport Research Economics (BITRE).</p>
 
+                <!-- Key Facts -->
                 <div class="key-facts-grid">
                     <div class="key-fact">
                         <span class="key-fact-icon">🏆</span>
@@ -78,6 +83,7 @@
                 </div>
             </div>
 
+            <!-- RIGHT SIDE — Dataset Coverage -->
             <div class="home-hero-right">
                 <div class="data-coverage">
                     <div class="coverage-title">📋 Dataset Coverage</div>
@@ -150,6 +156,7 @@
             </div>
         </div>
 
+        <!-- Stat Cards -->
         <div class="stats-section">
             <div class="stats-title">Key Enforcement Report · 2023–2024</div>
             <div class="stats-grid">
@@ -192,6 +199,7 @@
             </div>
         </div>
 
+        <!-- Navigation Cards -->
         <div class="nav-cards-section">
             <div class="nav-cards-title">Explore the Data</div>
             <div class="nav-cards-grid">
@@ -216,6 +224,7 @@
             </div>
         </div>
 
+        <!-- Data Limitations -->
         <div class="limitations-section">
             <div class="limitations-title">⚠️ Data Governance Notes</div>
             <div class="limitations-grid">
@@ -234,6 +243,7 @@
             </div>
         </div>
 
+        <!-- Footer -->
         <div class="dash-footer">
             <p>Data sourced from the Bureau of Infrastructure and Transport Research Economics (BITRE), 2024.</p>
             <p>COS30045 Data Visualization | Group 10 | Kartikyogam | Kugendran</p>
@@ -241,6 +251,7 @@
 
     </div>
 
+    <!-- ===================== FINES PAGE ===================== -->
     <div id="page-fines" class="page">
         <div class="page-header">
             <div class="page-header-left">
@@ -255,39 +266,32 @@
                 <select id="fines-offence-filter"><option value="all">All Offences</option></select>
             </div>
         </div>
-
-        <div class="mini-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="mini-stats">
             <div class="mini-stat">
-                <div class="mini-stat-label">Total Fines Issued</div>
+                <div class="mini-stat-label">Total Fines (Selected)</div>
                 <div class="mini-stat-value" id="fines-total">—</div>
             </div>
             <div class="mini-stat">
-                <div class="mini-stat-label">Total Related Arrests</div>
-                <div class="mini-stat-value" id="fines-arrests">—</div>
+                <div class="mini-stat-label">Top State</div>
+                <div class="mini-stat-value" id="fines-top-state">—</div>
             </div>
             <div class="mini-stat">
-                <div class="mini-stat-label">Total Related Charges</div>
-                <div class="mini-stat-value" id="fines-charges" >—</div>
+                <div class="mini-stat-label">Top Age Group</div>
+                <div class="mini-stat-value" id="fines-top-age">—</div>
             </div>
             <div class="mini-stat">
-                <div class="mini-stat-label">Top Offence Type</div>
-                <div class="mini-stat-value" id="fines-top-offence" style="font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">—</div>
-            </div>
-            <div class="mini-stat">
-                <div class="mini-stat-label">Highest State Volume</div>
-                <div class="mini-stat-value" id="fines-top-state" style="font-size: 18px;">—</div>
-            </div>
-            <div class="mini-stat">
-                <div class="mini-stat-label">Top Age Demographic</div>
-                <div class="mini-stat-value" id="fines-top-age" style="font-size: 18px;">—</div>
+                <div class="mini-stat-label">Top Offence</div>
+                <div class="mini-stat-value" id="fines-top-offence">—</div>
             </div>
         </div>
 
+        <!-- Row 1 — Historical Trend (full width) -->
         <div class="chart-card full-width">
             <div class="chart-card-title">Historical Fines Trend by Offence Type (2008–2024)</div>
             <div id="fines-historical-chart"></div>
         </div>
 
+        <!-- Row 2 — Two charts side by side -->
         <div class="charts-grid-2">
             <div class="chart-card">
                 <div class="chart-card-title">Fines by State (2023–2024)</div>
@@ -299,13 +303,15 @@
             </div>
         </div>
 
+        <!-- Row 3 — Location chart (full width) -->
         <div class="chart-card full-width">
-            <div class="chart-card-title">Fines by Location Type</div>
+            <div class="chart-card-title">Fines by Location Type & Age Group</div>
             <div id="fines-location-chart"></div>
         </div>
 
     </div>
 
+    <!-- ===================== DRUG TESTS PAGE ===================== -->
     <div id="page-drugs" class="page">
         <div class="page-header">
             <div class="page-header-left">
@@ -343,11 +349,13 @@
             </div>
         </div>
 
+        <!-- Row 1 — Historical trend (full width) -->
         <div class="chart-card full-width">
             <div class="chart-card-title">Historical Drug Test Trend by State (2008–2024)</div>
             <div id="drug-historical-chart"></div>
         </div>
 
+        <!-- Row 2 — Two charts side by side -->
         <div class="charts-grid-2">
             <div class="chart-card">
                 <div class="chart-card-title">Drug Type Breakdown (2023–2024)</div>
@@ -359,6 +367,7 @@
             </div>
         </div>
 
+        <!-- Row 3 — Fines vs Arrests vs Charges (full width) -->
         <div class="chart-card full-width">
             <div class="chart-card-title">Enforcement Actions by State — Fines, Arrests & Charges</div>
             <div id="drug-actions-chart"></div>
@@ -366,6 +375,7 @@
 
     </div>
 
+    <!-- ===================== BREATH TESTS PAGE ===================== -->
     <div id="page-breath" class="page">
         <div class="page-header">
             <div class="page-header-left">
@@ -397,11 +407,13 @@
             </div>
         </div>
 
+        <!-- Row 1 — Historical trend (full width) -->
         <div class="chart-card full-width">
             <div class="chart-card-title">Historical Breath Test Trend by State (2008–2024)</div>
             <div id="breath-historical-chart"></div>
         </div>
 
+        <!-- Row 2 — Two charts side by side -->
         <div class="charts-grid-2">
             <div class="chart-card">
                 <div class="chart-card-title">Total Positive Tests by State (2023–2024)</div>

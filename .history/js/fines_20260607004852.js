@@ -132,22 +132,14 @@ function applyFinesFilters() {
     if (selectedOffence !== "all") filteredLocation = filteredLocation.filter(d => d.METRIC === selectedOffence);
 
     // ── 5. UPDATE INTERACTIVE MINI STATS CARDS ──
-    // Compute Core Sums
     const totalFines = d3.sum(filteredAge, d => d["TOTAL FINES"]);
-    const totalArrests = d3.sum(filteredHistorical, d => d["TOTAL ARRESTS"]);
-    const totalCharges = d3.sum(filteredHistorical, d => d["TOTAL CHARGES"]);
-
-    // Find Tops
     const topState = finalState.sort((a,b) => b["TOTAL FINES"] - a["TOTAL FINES"])[0];
     const ageMap = d3.rollup(filteredAge, v => d3.sum(v, d => d["TOTAL FINES"]), d => d.AGE_GROUP);
     const topAge = [...ageMap.entries()].sort((a,b) => b[1]-a[1])[0];
-    const metricMap = d3.rollup(filteredHistorical, v => d3.sum(v, d => d["TOTAL FINES"]), d => d.METRIC);
+    const metricMap = d3.rollup(finesAgeData, v => d3.sum(v, d => d["TOTAL FINES"]), d => d.METRIC);
     const topOffence = [...metricMap.entries()].sort((a,b) => b[1]-a[1])[0];
 
-    // Push into DOM Elements
     d3.select("#fines-total").text(totalFines.toLocaleString());
-    d3.select("#fines-arrests").text(totalArrests.toLocaleString());
-    d3.select("#fines-charges").text(totalCharges.toLocaleString());
     d3.select("#fines-top-state").text(topState ? topState.STATE : "—");
     d3.select("#fines-top-age").text(topAge ? topAge[0] : "—");
     d3.select("#fines-top-offence").text(topOffence ? (metricLabels[topOffence[0]] || topOffence[0]) : "—");
@@ -183,6 +175,7 @@ function drawFinesHistorical(data) {
         .domain(d3.extent(data, d => d.YEAR))
         .range([0, width]);
 
+    // Uses incoming data array to adaptively rescale Y axis to combat clutter
     const y = d3.scaleLinear()
         .domain([0, d3.max(data, d => d["TOTAL FINES"]) * 1.1 || 100])
         .range([height, 0]);
@@ -378,6 +371,7 @@ function drawFinesAge(data) {
 function drawFinesLocation(data) {
     d3.select("#fines-location-chart").selectAll("*").remove();
 
+    // Injected Placeholder Box Fix when a State has no Regional Breakdown records
     if (data.length === 0) {
         d3.select("#fines-location-chart")
             .append("div")
@@ -392,7 +386,7 @@ function drawFinesLocation(data) {
             .style("background", "#f8fafc")
             .style("border", "1px dashed #e2e8f0")
             .style("border-radius", "8px")
-            .text("Regional location data unavailable for selected filters.");
+            .text("Regional location data unavailable for selected states and o.");
         return;
     }
 
