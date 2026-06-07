@@ -81,16 +81,10 @@ Promise.all([
     // Populate offence filter dynamically
     const metrics = [...new Set(finesHistoricalData.map(d => d.METRIC))].sort();
     const offenceFilter = d3.select("#fines-offence-filter");
-    
-    offenceFilter.selectAll("option:not([value='all'])").remove();
-
-    metrics.forEach(m => {
-        if (m === "all" || m === "All Offences") return;
-
-        offenceFilter.append("option")
-            .attr("value", m)
-            .text(metricLabels[m] || m);
-    });
+    offenceFilter.append("option").attr("value", "all").text("All Offences");
+    metrics.forEach(m => offenceFilter.append("option")
+        .attr("value", m)
+        .text(metricLabels[m] || m));
 
     // Event listeners
     d3.select("#fines-state-filter").on("change", applyFinesFilters);

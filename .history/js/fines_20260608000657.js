@@ -82,9 +82,15 @@ Promise.all([
     const metrics = [...new Set(finesHistoricalData.map(d => d.METRIC))].sort();
     const offenceFilter = d3.select("#fines-offence-filter");
     
+    // 1. Clear out everything except the hardcoded 'All Offences' from your HTML
     offenceFilter.selectAll("option:not([value='all'])").remove();
-
+    
+    // 2. COMMENT OUT OR REMOVE this line so it doesn't create a second 'All Offences'
+    // offenceFilter.append("option").attr("value", "all").text("All Offences");
+    
+    // 3. Append only the unique metrics from your CSV data
     metrics.forEach(m => {
+        // Skip appending if the metric from the CSV is somehow literally named "all" or "All Offences"
         if (m === "all" || m === "All Offences") return;
 
         offenceFilter.append("option")

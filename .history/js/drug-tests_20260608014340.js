@@ -1,10 +1,10 @@
 // =====================
-// DRUG-TESTS.JS (STATE-OPTIMIZED INTERACTIVE DASHBOARD)
+// DRUG-TESTS.JS
 // 4 Charts:
-// 1. Historical trend (Timeline 2008-2024) — drug_historical_trend.csv
-// 2. Drug type breakdown (Donut) — drug_by_type.csv
-// 3. Positive tests by state (Horizontal Bar) — drug_by_year_state.csv
-// 4. Enforcement actions (Grouped Bar) — drug_by_year_state.csv
+// 1. Historical trend (multi-line) — drug_historical_trend.csv
+// 2. Drug type breakdown (donut) — drug_by_type.csv
+// 3. Positive tests by state (horizontal bar) — drug_by_year_state.csv
+// 4. Enforcement actions (grouped bar) — drug_by_year_state.csv
 // =====================
 
 const drugTooltip = d3.select("body").append("div").attr("class", "tooltip");
@@ -31,7 +31,7 @@ const drugLabels = {
     "METHYLAMPHETAMINE": "Methylamphetamine"
 };
 
-// Global Data Arrays
+// Store raw data globally
 let drugHistoricalData = [];
 let drugTypeData = [];
 let drugStateData = [];
@@ -43,7 +43,7 @@ Promise.all([
     d3.csv("data/drug_by_year_state.csv")
 ]).then(function([historical, byType, byState]) {
 
-    // Parse Data Types
+    // Parse
     historical.forEach(d => { d.YEAR = +d.YEAR; d.COUNT = +d.COUNT; });
     byType.forEach(d => {
         d.YEAR = +d.YEAR;
@@ -65,41 +65,44 @@ Promise.all([
     drugTypeData = byType;
     drugStateData = byState;
 
-    // Populate Master State Filter Dropdown
+    // Populate state filter
     const states = [...new Set(historical.map(d => d.STATE))].sort();
     const stateFilter = d3.select("#drug-state-filter");
     stateFilter.selectAll("option:not([value='all'])").remove();
     states.forEach(s => stateFilter.append("option").attr("value", s).text(s));
 
-    // Event Listener hooked directly up to our State Master filter
-    d3.select("#drug-state-filter").on("change", applyDrugFilters);
+    // Populate year filter dynamically with the complete 2008-2024 scope
+    const years = [...new Set(historical.map(d => d.YEAR))].filter(y => y > 0).sort((a, b) => b - a);
+    const yearFilter = d3.select("#drug-year-filter");
+    yearFilter.selectAll("option:not([value='all'])").remove();
+    years.forEach(y => yearFilter.append("option").attr("value", y).text(y));
 
-    // Run layout render on page load
+    // Event listeners
+    d3.select("#drug-state-filter").on("change", applyDrugFilters);
+    d3.select("#drug-year-filter").on("change", applyDrugFilters);
+
     applyDrugFilters();
 });
 
 function applyDrugFilters() {
     const selectedState = d3.select("#drug-state-filter").property("value") || "all";
+    const selectedYear = d3.select("#drug-year-filter").property("value") || "all";
 
-    // ── 1. FILTER HISTORICAL ARRAY ──
+    // Filter historical: Always keep all years so the timeline forms real connecting line trends!
     let filteredHistorical = drugHistoricalData.slice();
-    if (selectedState !== "all") {
-        filteredHistorical = filteredHistorical.filter(d => d.STATE === selectedState);
-    }
+    if (selectedState !== "all") filteredHistorical = filteredHistorical.filter(d => d.STATE === selectedState);
 
-    // ── 2. FILTER STATE ENFORCEMENT ARRAY ──
+    // Filter state data (KPIs and Bar graphs)
     let filteredState = drugStateData.slice();
-    if (selectedState !== "all") {
-        filteredState = filteredState.filter(d => d.STATE === selectedState);
-    }
+    if (selectedState !== "all") filteredState = filteredState.filter(d => d.STATE === selectedState);
+    if (selectedYear !== "all") filteredState = filteredState.filter(d => d.YEAR === +selectedYear);
 
-    // ── 3. FILTER DRUG TYPE BREAKDOWN ARRAY ──
+    // Filter type data (Donut chart breakdown): Must filter by BOTH state and year
     let filteredType = drugTypeData.slice();
-    if (selectedState !== "all") {
-        filteredType = filteredType.filter(d => d.STATE === selectedState);
-    }
+    if (selectedState !== "all") filteredType = filteredType.filter(d => d.STATE === selectedState);
+    if (selectedYear !== "all") filteredType = filteredType.filter(d => d.YEAR === +selectedYear);
 
-    // ── 4. LIVE SUMMARY STATS CALCULATIONS ──
+    // Update mini stats
     const totalTests = d3.sum(filteredState, d => d.COUNT);
     const totalCharges = d3.sum(filteredState, d => d.CHARGES);
     const totalArrests = d3.sum(filteredState, d => d.ARRESTS);
@@ -108,20 +111,19 @@ function applyDrugFilters() {
     const drugTotals = drugs.map(drug => ({ drug, value: d3.sum(filteredType, d => d[drug]) }));
     const topDrug = drugTotals.sort((a,b) => b.value - a.value)[0];
 
-    // Update Dashboard metric values dynamically
     d3.select("#drug-total").text(totalTests.toLocaleString());
     d3.select("#drug-charges").text(totalCharges.toLocaleString());
     d3.select("#drug-arrests").text(totalArrests.toLocaleString());
     d3.select("#drug-top").text(topDrug && topDrug.value > 0 ? (drugLabels[topDrug.drug] || topDrug.drug) : "—");
 
-    // ── 5. REDRAW CHARTS (100% CLEAN SYNCHRONIZATION) ──
+    // Draw all charts cleanly
     drawDrugHistorical(filteredHistorical);
     drawDrugDonut(filteredType);
     drawDrugBar(filteredState);
     drawDrugActions(filteredState);
 }
 
-// ── CHART 1: Historical Trend (Complete timeline trend, never breaks) ──
+// ── CHART 1: Historical Trend ──
 function drawDrugHistorical(data) {
     d3.select("#drug-historical-chart").selectAll("*").remove();
     if (data.length === 0) return;
@@ -143,13 +145,13 @@ function drawDrugHistorical(data) {
     const x = d3.scaleLinear().domain(d3.extent(data, d => d.YEAR)).range([0, width]);
     const y = d3.scaleLinear().domain([0, d3.max(data, d => d.COUNT) * 1.1 || 100]).range([height, 0]);
 
-    // Grid lines background
+    // Grid
     svg.append("g").attr("class", "grid")
         .call(d3.axisLeft(y).ticks(5).tickSize(-width).tickFormat(""))
         .selectAll("line").style("stroke", "#f1f5f9").style("stroke-dasharray", "4,4");
     svg.select(".grid .domain").remove();
 
-    // Bottom Axis (All years 2008 to 2024 listed cleanly)
+    // Axes - Forces all unique years to display correctly
     svg.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x).tickValues(uniqueYears).tickFormat(d3.format("d")));
 
@@ -175,12 +177,12 @@ function drawDrugHistorical(data) {
 
         svg.append("path").datum(sorted)
             .attr("fill", "none").attr("stroke", color)
-            .attr("stroke-width", 2.5).attr("d", line);
+            .attr("stroke-width", 2).attr("d", line);
 
         svg.selectAll(`.dot-${state}`)
             .data(sorted).enter().append("circle")
             .attr("cx", d => x(d.YEAR)).attr("cy", d => y(d.COUNT))
-            .attr("r", 3.5).attr("fill", color).attr("stroke", "white").attr("stroke-width", 1.5)
+            .attr("r", 3).attr("fill", color).attr("stroke", "white").attr("stroke-width", 1.5)
             .on("mouseover", function(event, d) {
                 drugTooltip.style("opacity", 1)
                     .html(`<strong>${d.STATE}</strong><br>Year: ${d.YEAR}<br>Positive Tests: ${d.COUNT.toLocaleString()}`);
@@ -191,18 +193,18 @@ function drawDrugHistorical(data) {
             .on("mouseout", function() { drugTooltip.style("opacity", 0); });
     });
 
-    // Sidebar Legend
-    const legend = svg.append("g").attr("transform", `translate(${width + 12}, 0)`);
+    // Legend
+    const legend = svg.append("g").attr("transform", `translate(${width + 8}, 0)`);
     ([...grouped.keys()]).sort().forEach((state, i) => {
         const row = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
         row.append("line").attr("x1", 0).attr("x2", 14).attr("y1", 6).attr("y2", 6)
-            .attr("stroke", stateLineColors[state] || "#94a3b8").attr("stroke-width", 2.5);
+            .attr("stroke", stateLineColors[state] || "#94a3b8").attr("stroke-width", 2);
         row.append("text").attr("x", 18).attr("y", 10).attr("font-size", "11px")
             .attr("fill", "#475569").attr("font-family", "DM Sans, sans-serif").text(state);
     });
 }
 
-// ── CHART 2: Drug Type Donut Breakdown ──
+// ── CHART 2: Drug Type Donut ──
 function drawDrugDonut(data) {
     d3.select("#drug-donut-chart").selectAll("*").remove();
 
@@ -228,10 +230,11 @@ function drawDrugDonut(data) {
 
     const total = d3.sum(totals, d => d.value);
 
+    // Safeguard check for empty text
     if (total === 0) {
         svg.append("text").attr("text-anchor", "middle")
             .attr("font-size", "14px").attr("fill", "#94a3b8")
-            .attr("font-family", "DM Sans, sans-serif").text("No Drug Breakdown Data");
+            .attr("font-family", "DM Sans, sans-serif").text("No Data for Selection");
         return;
     }
 
@@ -259,16 +262,16 @@ function drawDrugDonut(data) {
             drugTooltip.style("opacity", 0);
         });
 
-    // Inner Donut Info Context
+    // Center text
     svg.append("text").attr("text-anchor", "middle").attr("dy", "-0.3em")
-        .attr("font-size", "18px").attr("font-weight", "700")
+        .attr("font-size", "20px").attr("font-weight", "700")
         .attr("font-family", "Syne, sans-serif").attr("fill", "#0f172a")
         .text(total.toLocaleString());
     svg.append("text").attr("text-anchor", "middle").attr("dy", "1.2em")
         .attr("font-size", "10px").attr("fill", "#94a3b8")
         .attr("font-family", "DM Sans, sans-serif").text("Total Detections");
 
-    // Grid Legend Layout
+    // Legend
     const legendG = svg.append("g").attr("transform", `translate(${-radius}, ${radius + 16})`);
     totals.forEach((d, i) => {
         const col = i % 2;
@@ -281,7 +284,7 @@ function drawDrugDonut(data) {
     });
 }
 
-// ── CHART 3: Total Postive Records Ranked ──
+// ── CHART 3: Positive Tests by State ──
 function drawDrugBar(data) {
     d3.select("#drug-bar-chart").selectAll("*").remove();
     if (data.length === 0) return;
@@ -297,6 +300,7 @@ function drawDrugBar(data) {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    // Sum by state
     const stateMap = d3.rollup(data, v => d3.sum(v, d => d.COUNT), d => d.STATE);
     const chartData = Array.from(stateMap, ([state, count]) => ({ state, count }))
         .sort((a,b) => b.count - a.count);
@@ -325,7 +329,7 @@ function drawDrugBar(data) {
         .on("mouseover", function(event, d) {
             d3.select(this).attr("opacity", 0.8);
             drugTooltip.style("opacity", 1)
-                .html(`<strong>${d.state}</strong><br>Total Positive Tests: ${d.count.toLocaleString()}`);
+                .html(`<strong>${d.state}</strong><br>Positive Tests: ${d.count.toLocaleString()}`);
         })
         .on("mousemove", function(event) {
             drugTooltip.style("left", (event.pageX + 14) + "px").style("top", (event.pageY - 32) + "px");
@@ -343,7 +347,7 @@ function drawDrugBar(data) {
         .text(d => d.count.toLocaleString());
 }
 
-// ── CHART 4: Enforcement Actions Grouped Bar Layout ──
+// ── CHART 4: Enforcement Actions (Grouped Bar) ──
 function drawDrugActions(data) {
     d3.select("#drug-actions-chart").selectAll("*").remove();
     if (data.length === 0) return;
@@ -359,6 +363,7 @@ function drawDrugActions(data) {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    // Sum by state
     const stateMap = d3.rollup(data, v => ({
         FINES: d3.sum(v, d => d.FINES),
         ARRESTS: d3.sum(v, d => d.ARRESTS),
@@ -380,7 +385,8 @@ function drawDrugActions(data) {
         .selectAll("line").style("stroke", "#f1f5f9").style("stroke-dasharray", "4,4");
     svg.select(".grid .domain").remove();
 
-    svg.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x0));
+    svg.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x0));
 
     svg.append("g").attr("class", "axis")
         .call(d3.axisLeft(y).ticks(5).tickFormat(d => {
@@ -389,6 +395,7 @@ function drawDrugActions(data) {
             return d;
         }));
 
+    // Grouped bars
     const stateGroups = svg.selectAll(".state-group")
         .data(states).enter().append("g")
         .attr("class", "state-group")
@@ -417,6 +424,7 @@ function drawDrugActions(data) {
         .attr("y", d => d.value > 0 ? y(d.value) : height)
         .attr("height", d => d.value > 0 ? Math.max(height - y(d.value), 3) : 0);
 
+    // Legend
     const legend = svg.append("g").attr("transform", `translate(${width + 12}, 0)`);
     actions.forEach((action, i) => {
         const row = legend.append("g").attr("transform", `translate(0, ${i * 24})`);
