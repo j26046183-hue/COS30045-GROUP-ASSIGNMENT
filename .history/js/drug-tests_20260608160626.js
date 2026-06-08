@@ -73,8 +73,6 @@ Promise.all([
 
     // Single click/change hook on State dropdown selector
     d3.select("#drug-state-filter").on("change", applyDrugFilters);
-    d3.select("#donut-year-filter").on("change", applyDrugFilters);
-    d3.select("#lollipop-year-filter").on("change", applyDrugFilters);
 
     // Initial load view setup
     applyDrugFilters();
@@ -320,7 +318,6 @@ function drawDrugDonut(data) {
     
     legendG.attr("transform", `translate(${legendOffsetX}, ${legendOffsetY})`);
 }
-
 // ── CHART 3: Total Positive Records Ranked ──
 function drawDrugBar(data) {
     d3.select("#drug-bar-chart").selectAll("*").remove();
@@ -527,51 +524,4 @@ function drawDrugActions(data) {
         row.append("text").attr("x", 16).attr("y", 10).attr("font-size", "12px")
             .attr("fill", "#475569").attr("font-family", "DM Sans, sans-serif").text(action);
     });
-}
-
-function applyDrugFilters() {
-    // 1. Read all three active filter elements independently
-    const selectedState = d3.select("#drug-state-filter").property("value") || "all";
-    const donutYear = d3.select("#donut-year-filter").property("value") || "all";
-    const lollipopYear = d3.select("#lollipop-year-filter").property("value") || "all";
-
-    // 2. Base Historical Data Streams (Listens ONLY to global state filter)
-    let filteredHistorical = drugHistoricalData.slice();
-    if (selectedState !== "all") filteredHistorical = filteredHistorical.filter(d => d.STATE === selectedState);
-
-    let filteredState = drugStateData.slice();
-    if (selectedState !== "all") filteredState = filteredState.filter(d => d.STATE === selectedState);
-
-
-    // 3. DONUT DATA: Listens to global state + its own local Donut filter 🍩
-    let filteredType = drugTypeData.slice();
-    if (selectedState !== "all") filteredType = filteredType.filter(d => d.STATE === selectedState);
-    if (donutYear !== "all") filteredType = filteredType.filter(d => d.YEAR === +donutYear);
-
-
-    // 4. LOLLIPOP DATA: Listens to global state + its own local Lollipop filter 🍭
-    let filteredLollipop = drugStateData.slice();
-    if (selectedState !== "all") filteredLollipop = filteredLollipop.filter(d => d.STATE === selectedState);
-    if (lollipopYear !== "all") filteredLollipop = filteredLollipop.filter(d => d.YEAR === +lollipopYear);
-
-
-    // 5. Card Summary Calculations (Kept stable relative to global state selection context)
-    const totalTests = d3.sum(filteredState, d => d.COUNT);
-    const totalCharges = d3.sum(filteredState, d => d.CHARGES);
-    const totalArrests = d3.sum(filteredState, d => d.ARRESTS);
-    
-    const drugs = ["AMPHETAMINE", "CANNABIS", "COCAINE", "ECSTASY", "METHYLAMPHETAMINE"];
-    const drugTotals = drugs.map(drug => ({ drug, value: d3.sum(filteredType, d => d[drug]) }));
-    const topDrug = drugTotals.sort((a,b) => b.value - a.value)[0];
-
-    d3.select("#drug-total").text(totalTests.toLocaleString());
-    d3.select("#drug-charges").text(totalCharges.toLocaleString());
-    d3.select("#drug-arrests").text(totalArrests.toLocaleString());
-    d3.select("#drug-top").text(topDrug && topDrug.value > 0 ? (drugLabels[topDrug.drug] || topDrug.drug) : "—");
-
-    // 6. Draw functions execution
-    drawDrugHistorical(filteredHistorical);
-    drawDrugDonut(filteredType);       // strictly follows donutYear
-    drawDrugBar(filteredLollipop);     // strictly follows lollipopYear
-    drawDrugActions(filteredState);
 }

@@ -73,8 +73,6 @@ Promise.all([
 
     // Single click/change hook on State dropdown selector
     d3.select("#drug-state-filter").on("change", applyDrugFilters);
-    d3.select("#donut-year-filter").on("change", applyDrugFilters);
-    d3.select("#lollipop-year-filter").on("change", applyDrugFilters);
 
     // Initial load view setup
     applyDrugFilters();
@@ -202,31 +200,22 @@ function drawDrugHistorical(data) {
 }
 
 // ── CHART 2: Drug Type Donut Breakdown ──
-// ── FIXED CHART 2: Perfectly Styled & Centered Drug Type Donut ──
 function drawDrugDonut(data) {
     d3.select("#drug-donut-chart").selectAll("*").remove();
 
     const container = document.getElementById("drug-donut-chart");
     if (!container) return;
-    
-    // 1. Establish rigid square boundaries to keep it perfectly symmetrical
-    const width = container.offsetWidth;
-    const height = 320; // Locks height matching your layout cards perfectly
-    
-    // Tighten margins to completely reclaim the wasted whitespace
-    const margin = { top: 20, right: 20, bottom: 60, left: 20 };
-    
-    // Set radius dynamically relative to the safe height region
-    const radius = Math.min(width - margin.left - margin.right, height - margin.top - margin.bottom) / 2;
+    const size = Math.min(container.offsetWidth, 360);
+    const margin = { top: 10, right: 10, bottom: 80, left: 10 };
+    const radius = (size - margin.top - margin.bottom) / 2;
+    if (radius <= 0) return;
 
     const svg = d3.select("#drug-donut-chart")
         .append("svg")
-        .attr("width", width)
-        .attr("height", height);
-
-    // Main structural donut chart group centered inside the upper canvas space
-    const chartG = svg.append("g")
-        .attr("transform", `translate(${width / 2}, ${radius + margin.top})`);
+        .attr("width", size)
+        .attr("height", size)
+        .append("g")
+        .attr("transform", `translate(${size/2}, ${radius + margin.top})`);
 
     const drugs = ["AMPHETAMINE", "CANNABIS", "COCAINE", "ECSTASY", "METHYLAMPHETAMINE"];
     const totals = drugs.map(drug => ({
@@ -237,23 +226,22 @@ function drawDrugDonut(data) {
     const total = d3.sum(totals, d => d.value);
 
     if (total === 0) {
-        chartG.append("text").attr("text-anchor", "middle")
+        svg.append("text").attr("text-anchor", "middle")
             .attr("font-size", "14px").attr("fill", "#94a3b8")
             .attr("font-family", "DM Sans, sans-serif").text("No Drug Breakdown Data");
         return;
     }
 
-    // Slightly larger inner and outer boundaries so it scales up comfortably
     const pie = d3.pie().value(d => d.value).sort(null);
-    const arc = d3.arc().innerRadius(radius * 0.60).outerRadius(radius);
-    const arcHover = d3.arc().innerRadius(radius * 0.60).outerRadius(radius * 1.05);
+    const arc = d3.arc().innerRadius(radius * 0.55).outerRadius(radius);
+    const arcHover = d3.arc().innerRadius(radius * 0.55).outerRadius(radius * 1.06);
 
-    chartG.selectAll(".arc")
+    svg.selectAll(".arc")
         .data(pie(totals.filter(d => d.value > 0))).enter().append("path")
         .attr("class", "arc")
         .attr("d", arc)
         .attr("fill", d => drugColors[d.data.drug])
-        .attr("stroke", "white").attr("stroke-width", 2.5)
+        .attr("stroke", "white").attr("stroke-width", 2)
         .on("mouseover", function(event, d) {
             d3.select(this).attr("d", arcHover);
             const pct = ((d.data.value / total) * 100).toFixed(1);
@@ -268,65 +256,34 @@ function drawDrugDonut(data) {
             drugTooltip.style("opacity", 0);
         });
 
-    // Central Metric Text Indicators
-    chartG.append("text").attr("text-anchor", "middle").attr("dy", "-0.2em")
-        .attr("font-size", "22px").attr("font-weight", "700")
+    svg.append("text").attr("text-anchor", "middle").attr("dy", "-0.3em")
+        .attr("font-size", "18px").attr("font-weight", "700")
         .attr("font-family", "Syne, sans-serif").attr("fill", "#0f172a")
         .text(total.toLocaleString());
-        
-    chartG.append("text").attr("text-anchor", "middle").attr("dy", "1.2em")
-        .attr("font-size", "11px").attr("font-weight", "500")
-        .attr("font-family", "DM Sans, sans-serif").attr("fill", "#94a3b8")
-        .text("Total Detections");
+    svg.append("text").attr("text-anchor", "middle").attr("dy", "1.2em")
+        .attr("font-size", "10px").attr("fill", "#94a3b8")
+        .attr("font-family", "DM Sans, sans-serif").text("Total Detections");
 
-    // ── MULTI-COLUMN COMPACT HORIZONTAL LEGEND ENGINE ──
-    // This perfectly centers your text keys right beneath the scaling wheel!
-    const legendG = svg.append("g")
-        .attr("class", "donut-legend");
-        
-    let currentX = 0;
-    let currentY = 0;
-    const itemSpacingX = 135; // Column horizontal width separation spacing
-    const itemSpacingY = 20;  // Row structural padding spacing
-
+    const legendG = svg.append("g").attr("transform", `translate(${-radius}, ${radius + 16})`);
     totals.forEach((d, i) => {
-        const itemG = legendG.append("g")
-            .attr("transform", `translate(${currentX}, ${currentY})`);
-
-        itemG.append("rect")
-            .attr("width", 10).attr("height", 10)
-            .attr("rx", 2.5).attr("fill", drugColors[d.drug]);
-
-        itemG.append("text")
-            .attr("x", 16).attr("y", 9)
-            .attr("font-size", "11px").attr("font-weight", "500")
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        const g = legendG.append("g").attr("transform", `translate(${col * (radius + 20)}, ${row * 20})`);
+        g.append("rect").attr("width", 10).attr("height", 10).attr("rx", 2).attr("fill", drugColors[d.drug]);
+        g.append("text").attr("x", 14).attr("y", 9).attr("font-size", "10px")
             .attr("fill", "#475569").attr("font-family", "DM Sans, sans-serif")
             .text(drugLabels[d.drug]);
-
-        // Smart positioning: 2 item entries maximum per line row loop
-        if (i % 2 === 0) {
-            currentX += itemSpacingX;
-        } else {
-            currentX = 0;
-            currentY += itemSpacingY;
-        }
     });
-
-    // Center the complete assembled legend structure horizontally relative to total width
-    const legendBounds = legendG.node().getBBox();
-    const legendOffsetX = (width - legendBounds.width) / 2;
-    // Places the block uniformly right below our active radius path circles
-    const legendOffsetY = (radius * 2) + margin.top + 25; 
-    
-    legendG.attr("transform", `translate(${legendOffsetX}, ${legendOffsetY})`);
 }
 
 // ── CHART 3: Total Positive Records Ranked ──
+// ── REWRITTEN CHART 3: Premium Dynamic Tree Map Alternative ──
 function drawDrugBar(data) {
+    // We target the same HTML container id="drug-bar-chart" so you don't have to change your index.html!
     d3.select("#drug-bar-chart").selectAll("*").remove();
     if (data.length === 0) return;
 
-    const margin = { top: 20, right: 80, bottom: 40, left: 60 };
+    const margin = { top: 10, right: 10, bottom: 10, left: 10 };
     const width = document.getElementById("drug-bar-chart").offsetWidth - margin.left - margin.right;
     const height = 320 - margin.top - margin.bottom;
 
@@ -337,72 +294,66 @@ function drawDrugBar(data) {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    // 1. Roll up and aggregate total positive counts per state
     const stateMap = d3.rollup(data, v => d3.sum(v, d => d.COUNT), d => d.STATE);
     const chartData = Array.from(stateMap, ([state, count]) => ({ state, count }))
-        .sort((a,b) => b.count - a.count);
+        .filter(d => d.count > 0); // Drop any states with 0 tests
 
-    const x = d3.scaleLinear().domain([0, d3.max(chartData, d => d.count) * 1.1 || 100]).range([0, width]);
-    const y = d3.scaleBand().domain(chartData.map(d => d.state)).range([0, height]).padding(0.5);
+    if (chartData.length === 0) return;
 
-    // Clean dashed background grid lines
-    svg.append("g").attr("class", "grid")
-        .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(x).ticks(4).tickSize(-height).tickFormat(""))
-        .selectAll("line").style("stroke", "#f1f5f9").style("stroke-dasharray", "4,4");
-    svg.select(".grid .domain").remove();
+    // 2. Build D3 Hierarchy required for Tree Maps
+    const root = d3.hierarchy({ children: chartData })
+        .sum(d => d.count)
+        .sort((a, b) => b.value - a.value);
 
-    svg.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(x).ticks(4).tickFormat(d => d >= 1000000 ? `${(d/1000000).toFixed(1)}M` : d >= 1000 ? `${(d/1000).toFixed(0)}K` : d));
-    svg.append("g").attr("class", "axis").call(d3.axisLeft(y));
+    // 3. Initialize the D3 Treemap engine layout workspace
+    d3.treemap()
+        .size([width, height])
+        .paddingInner(4) // Spaces out the tiles beautifully
+        (root);
 
-    // 1. Draw the Lollipop Stems (Lines)
-    svg.selectAll(".lollipop-line")
-        .data(chartData).enter().append("line")
-        .attr("class", "lollipop-line")
-        .attr("x1", 0)
-        .attr("x2", 0) // Starts at 0 for expansion animation
-        .attr("y1", d => y(d.state) + y.bandwidth() / 2)
-        .attr("y2", d => y(d.state) + y.bandwidth() / 2)
-        .attr("stroke", d => stateLineColors[d.state] || "#2563eb")
-        .attr("stroke-width", 2.5)
-        .transition().duration(800).delay((d,i) => i * 50)
-        .attr("x2", d => x(d.count));
+    // 4. Draw Tile Groups
+    const nodes = svg.selectAll("g")
+        .data(root.leaves())
+        .enter().append("g")
+        .attr("transform", d => `translate(${d.x0},${d.y0})`);
 
-    // 2. Draw the Lollipop Heads (Circles)
-    svg.selectAll(".lollipop-circle")
-        .data(chartData).enter().append("circle")
-        .attr("class", "lollipop-circle")
-        .attr("cx", 0)
-        .attr("cy", d => y(d.state) + y.bandwidth() / 2)
-        .attr("r", 6)
-        .attr("fill", d => stateLineColors[d.state] || "#2563eb")
-        .attr("stroke", "white")
-        .attr("stroke-width", 1.5)
+    // Draw the actual structural rectangles
+    nodes.append("rect")
+        .attr("width", d => d.x1 - d.x0)
+        .attr("height", d => d.y1 - d.y0)
+        .attr("fill", d => stateLineColors[d.data.state] || "#2563eb")
+        .attr("rx", 6) // Smooth rounded corners for a modern feel
         .on("mouseover", function(event, d) {
-            d3.select(this).attr("r", 8);
+            d3.select(this).attr("opacity", 0.85);
             drugTooltip.style("opacity", 1)
-                .html(`<strong>${d.state}</strong><br>Positive Tests: ${d.count.toLocaleString()}`);
+                .html(`<strong>State: ${d.data.state}</strong><br>Positive Tests: ${d.data.count.toLocaleString()}`);
         })
         .on("mousemove", function(event) {
             drugTooltip.style("left", (event.pageX + 14) + "px").style("top", (event.pageY - 32) + "px");
         })
         .on("mouseout", function() {
-            d3.select(this).attr("r", 6);
+            d3.select(this).attr("opacity", 1);
             drugTooltip.style("opacity", 0);
-        })
-        .transition().duration(800).delay((d,i) => i * 50)
-        .attr("cx", d => x(d.count));
+        });
 
-    // 3. Add Labels past the circles
-    svg.selectAll(".lollipop-label")
-        .data(chartData).enter().append("text")
-        .attr("class", "lollipop-label")
-        .attr("x", d => x(d.count) + 12)
-        .attr("y", d => y(d.state) + y.bandwidth() / 2 + 4)
+    // 5. Append smart, responsive labels inside the tiles
+    nodes.append("text")
+        .attr("x", 8)
+        .attr("y", 22)
+        .attr("fill", "white")
+        .attr("font-size", "14px")
+        .attr("font-weight", "700")
+        .attr("font-family", "Syne, sans-serif")
+        .text(d => (d.x1 - d.x0 > 35 && d.y1 - d.y0 > 25) ? d.data.state : "");
+
+    nodes.append("text")
+        .attr("x", 8)
+        .attr("y", 38)
+        .attr("fill", "rgba(255,255,255,0.85)")
         .attr("font-size", "11px")
-        .attr("fill", "#475569")
         .attr("font-family", "DM Sans, sans-serif")
-        .text(d => d.count.toLocaleString());
+        .text(d => (d.x1 - d.x0 > 65 && d.y1 - d.y0 > 45) ? d.data.count.toLocaleString() : "");
 }
 
 // ── CHART 4: Enforcement Actions Grouped Bar Layout ──
@@ -527,51 +478,4 @@ function drawDrugActions(data) {
         row.append("text").attr("x", 16).attr("y", 10).attr("font-size", "12px")
             .attr("fill", "#475569").attr("font-family", "DM Sans, sans-serif").text(action);
     });
-}
-
-function applyDrugFilters() {
-    // 1. Read all three active filter elements independently
-    const selectedState = d3.select("#drug-state-filter").property("value") || "all";
-    const donutYear = d3.select("#donut-year-filter").property("value") || "all";
-    const lollipopYear = d3.select("#lollipop-year-filter").property("value") || "all";
-
-    // 2. Base Historical Data Streams (Listens ONLY to global state filter)
-    let filteredHistorical = drugHistoricalData.slice();
-    if (selectedState !== "all") filteredHistorical = filteredHistorical.filter(d => d.STATE === selectedState);
-
-    let filteredState = drugStateData.slice();
-    if (selectedState !== "all") filteredState = filteredState.filter(d => d.STATE === selectedState);
-
-
-    // 3. DONUT DATA: Listens to global state + its own local Donut filter 🍩
-    let filteredType = drugTypeData.slice();
-    if (selectedState !== "all") filteredType = filteredType.filter(d => d.STATE === selectedState);
-    if (donutYear !== "all") filteredType = filteredType.filter(d => d.YEAR === +donutYear);
-
-
-    // 4. LOLLIPOP DATA: Listens to global state + its own local Lollipop filter 🍭
-    let filteredLollipop = drugStateData.slice();
-    if (selectedState !== "all") filteredLollipop = filteredLollipop.filter(d => d.STATE === selectedState);
-    if (lollipopYear !== "all") filteredLollipop = filteredLollipop.filter(d => d.YEAR === +lollipopYear);
-
-
-    // 5. Card Summary Calculations (Kept stable relative to global state selection context)
-    const totalTests = d3.sum(filteredState, d => d.COUNT);
-    const totalCharges = d3.sum(filteredState, d => d.CHARGES);
-    const totalArrests = d3.sum(filteredState, d => d.ARRESTS);
-    
-    const drugs = ["AMPHETAMINE", "CANNABIS", "COCAINE", "ECSTASY", "METHYLAMPHETAMINE"];
-    const drugTotals = drugs.map(drug => ({ drug, value: d3.sum(filteredType, d => d[drug]) }));
-    const topDrug = drugTotals.sort((a,b) => b.value - a.value)[0];
-
-    d3.select("#drug-total").text(totalTests.toLocaleString());
-    d3.select("#drug-charges").text(totalCharges.toLocaleString());
-    d3.select("#drug-arrests").text(totalArrests.toLocaleString());
-    d3.select("#drug-top").text(topDrug && topDrug.value > 0 ? (drugLabels[topDrug.drug] || topDrug.drug) : "—");
-
-    // 6. Draw functions execution
-    drawDrugHistorical(filteredHistorical);
-    drawDrugDonut(filteredType);       // strictly follows donutYear
-    drawDrugBar(filteredLollipop);     // strictly follows lollipopYear
-    drawDrugActions(filteredState);
 }

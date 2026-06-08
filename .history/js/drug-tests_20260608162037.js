@@ -529,11 +529,26 @@ function drawDrugActions(data) {
     });
 }
 
+// =========================================================================
+// 1. PLACE THESE TRACKING VARIABLES OUTSIDE / ABOVE YOUR FUNCTION IN THE FILE
+// =========================================================================
+let lastStateFilter = "all";
+let lastDonutYear = "all";
+let lastLollipopYear = "all";
+
+// =========================================================================
+// 2. THE COMPLETED SMART FUNCTION WITH ISOLATED RENDERING CONDITIONAL CHECKS
+// =========================================================================
 function applyDrugFilters() {
     // 1. Read all three active filter elements independently
     const selectedState = d3.select("#drug-state-filter").property("value") || "all";
     const donutYear = d3.select("#donut-year-filter").property("value") || "all";
     const lollipopYear = d3.select("#lollipop-year-filter").property("value") || "all";
+
+    // Track exactly what changed dynamically on this interaction cycle
+    const stateChanged = (selectedState !== lastStateFilter);
+    const donutChanged = (donutYear !== lastDonutYear);
+    const lollipopChanged = (lollipopYear !== lastLollipopYear);
 
     // 2. Base Historical Data Streams (Listens ONLY to global state filter)
     let filteredHistorical = drugHistoricalData.slice();
@@ -556,22 +571,48 @@ function applyDrugFilters() {
 
 
     // 5. Card Summary Calculations (Kept stable relative to global state selection context)
-    const totalTests = d3.sum(filteredState, d => d.COUNT);
-    const totalCharges = d3.sum(filteredState, d => d.CHARGES);
-    const totalArrests = d3.sum(filteredState, d => d.ARRESTS);
+    // Run if global state changed, or if donut year moved to sync the 'Most Common Drug' info tag
+    if (stateChanged || donutChanged || lollipopChanged) {
+        const totalTests = d3.sum(filteredState, d => d.COUNT);
+        const totalCharges = d3.sum(filteredState, d => d.CHARGES);
+        const totalArrests = d3.sum(filteredState, d => d.ARRESTS);
+        
+        const drugs = ["AMPHETAMINE", "CANNABIS", "COCAINE", "ECSTASY", "METHYLAMPHETAMINE"];
+        const drugTotals = drugs.map(drug => ({ drug, value: d3.sum(filteredType, d => d[drug]) }));
+        const topDrug = drugTotals.sort((a,b) => b.value - a.value)[0];
+
+        d3.select("#drug-total").text(totalTests.toLocaleString());
+        d3.select("#drug-charges").text(totalCharges.toLocaleString());
+        d3.select("#drug-arrests").text(totalArrests.toLocaleString());
+        d3.select("#drug-top").text(topDrug && topDrug.value > 0 ? (drugLabels[topDrug.drug] || topDrug.drug) : "—");
+    }
+
+    // ==========================================
+    // 6. EXCLUSIVE TARGETED RENDERING ENGINE 🛠️
+    // ==========================================
     
-    const drugs = ["AMPHETAMINE", "CANNABIS", "COCAINE", "ECSTASY", "METHYLAMPHETAMINE"];
-    const drugTotals = drugs.map(drug => ({ drug, value: d3.sum(filteredType, d => d[drug]) }));
-    const topDrug = drugTotals.sort((a,b) => b.value - a.value)[0];
+    // Historical Trends Line Chart - Reruns ONLY if global state moves
+    if (stateChanged) {
+        drawDrugHistorical(filteredHistorical);
+    }
 
-    d3.select("#drug-total").text(totalTests.toLocaleString());
-    d3.select("#drug-charges").text(totalCharges.toLocaleString());
-    d3.select("#drug-arrests").text(totalArrests.toLocaleString());
-    d3.select("#drug-top").text(topDrug && topDrug.value > 0 ? (drugLabels[topDrug.drug] || topDrug.drug) : "—");
+    // Donut Chart - Updates ONLY if global state moves OR local donut filter moves 🍩
+    if (stateChanged || donutChanged) {
+        drawDrugDonut(filteredType);
+    }
 
-    // 6. Draw functions execution
-    drawDrugHistorical(filteredHistorical);
-    drawDrugDonut(filteredType);       // strictly follows donutYear
-    drawDrugBar(filteredLollipop);     // strictly follows lollipopYear
-    drawDrugActions(filteredState);
+    // Lollipop Chart - Updates ONLY if global state moves OR local lollipop filter moves 🍭
+    if (stateChanged || lollipopChanged) {
+        drawDrugBar(filteredLollipop);
+    }
+
+    // Bottom Grouped Enforcement Action Chart - Reruns ONLY if global state moves
+    if (stateChanged) {
+        drawDrugActions(filteredState);
+    }
+
+    // Cache the states into context memory to evaluate on the next user event trigger
+    lastStateFilter = selectedState;
+    lastDonutYear = donutYear;
+    lastLollipopYear = lollipopYear;
 }

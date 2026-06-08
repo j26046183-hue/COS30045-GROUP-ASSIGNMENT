@@ -73,8 +73,7 @@ Promise.all([
 
     // Single click/change hook on State dropdown selector
     d3.select("#drug-state-filter").on("change", applyDrugFilters);
-    d3.select("#donut-year-filter").on("change", applyDrugFilters);
-    d3.select("#lollipop-year-filter").on("change", applyDrugFilters);
+    d3.select("#drug-recent-year-filter").on("change", applyDrugFilters);
 
     // Initial load view setup
     applyDrugFilters();
@@ -530,48 +529,32 @@ function drawDrugActions(data) {
 }
 
 function applyDrugFilters() {
-    // 1. Read all three active filter elements independently
+    // 1. Get both filter values
     const selectedState = d3.select("#drug-state-filter").property("value") || "all";
-    const donutYear = d3.select("#donut-year-filter").property("value") || "all";
-    const lollipopYear = d3.select("#lollipop-year-filter").property("value") || "all";
+    const selectedRecentYear = d3.select("#drug-recent-year-filter").property("value") || "all";
 
-    // 2. Base Historical Data Streams (Listens ONLY to global state filter)
+    // 2. Filter historical data (Stays stable, ignores year filter)
     let filteredHistorical = drugHistoricalData.slice();
     if (selectedState !== "all") filteredHistorical = filteredHistorical.filter(d => d.STATE === selectedState);
 
     let filteredState = drugStateData.slice();
     if (selectedState !== "all") filteredState = filteredState.filter(d => d.STATE === selectedState);
 
-
-    // 3. DONUT DATA: Listens to global state + its own local Donut filter 🍩
+    // 3. APPLY DOUBLE FILTER FOR THE DONUT DATA ARRAY
     let filteredType = drugTypeData.slice();
     if (selectedState !== "all") filteredType = filteredType.filter(d => d.STATE === selectedState);
-    if (donutYear !== "all") filteredType = filteredType.filter(d => d.YEAR === +donutYear);
+    if (selectedRecentYear !== "all") filteredType = filteredType.filter(d => d.YEAR === +selectedRecentYear);
 
-
-    // 4. LOLLIPOP DATA: Listens to global state + its own local Lollipop filter 🍭
+    // 4. APPLY DOUBLE FILTER FOR THE LOLLIPOP DATA ARRAY
     let filteredLollipop = drugStateData.slice();
     if (selectedState !== "all") filteredLollipop = filteredLollipop.filter(d => d.STATE === selectedState);
-    if (lollipopYear !== "all") filteredLollipop = filteredLollipop.filter(d => d.YEAR === +lollipopYear);
+    if (selectedRecentYear !== "all") filteredLollipop = filteredLollipop.filter(d => d.YEAR === +selectedRecentYear);
 
+    // ... (keep your card summary stats update code here) ...
 
-    // 5. Card Summary Calculations (Kept stable relative to global state selection context)
-    const totalTests = d3.sum(filteredState, d => d.COUNT);
-    const totalCharges = d3.sum(filteredState, d => d.CHARGES);
-    const totalArrests = d3.sum(filteredState, d => d.ARRESTS);
-    
-    const drugs = ["AMPHETAMINE", "CANNABIS", "COCAINE", "ECSTASY", "METHYLAMPHETAMINE"];
-    const drugTotals = drugs.map(drug => ({ drug, value: d3.sum(filteredType, d => d[drug]) }));
-    const topDrug = drugTotals.sort((a,b) => b.value - a.value)[0];
-
-    d3.select("#drug-total").text(totalTests.toLocaleString());
-    d3.select("#drug-charges").text(totalCharges.toLocaleString());
-    d3.select("#drug-arrests").text(totalArrests.toLocaleString());
-    d3.select("#drug-top").text(topDrug && topDrug.value > 0 ? (drugLabels[topDrug.drug] || topDrug.drug) : "—");
-
-    // 6. Draw functions execution
+    // 5. Pass the newly filtered arrays into your draw functions
     drawDrugHistorical(filteredHistorical);
-    drawDrugDonut(filteredType);       // strictly follows donutYear
-    drawDrugBar(filteredLollipop);     // strictly follows lollipopYear
+    drawDrugDonut(filteredType);       // Receives the double-filtered data!
+    drawDrugBar(filteredLollipop);     // Receives the double-filtered data!
     drawDrugActions(filteredState);
 }
