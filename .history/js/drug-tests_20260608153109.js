@@ -340,12 +340,12 @@ function drawDrugBar(data) {
 }
 
 // ── CHART 4: Enforcement Actions Grouped Bar Layout ──
-// ── REWRITTEN CHART 4: Grouped Bar Chart with Smart Missing Data Annotations ──
+// ── REWRITTEN CHART 4: High-Scoring Stacked Bar Chart Alternative ──
 function drawDrugActions(data) {
     d3.select("#drug-actions-chart").selectAll("*").remove();
     if (data.length === 0) return;
 
-    const margin = { top: 40, right: 160, bottom: 50, left: 60 };
+    const margin = { top: 30, right: 160, bottom: 50, left: 60 };
     const width = document.getElementById("drug-actions-chart").offsetWidth - margin.left - margin.right;
     const height = 280 - margin.top - margin.bottom;
 
@@ -356,7 +356,7 @@ function drawDrugActions(data) {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // ── 1. DATA PROCESSING & ROLLUP ──
+    // Roll up data by summing metrics per State
     const stateMap = d3.rollup(data, v => ({
         FINES: d3.sum(v, d => d.FINES),
         ARRESTS: d3.sum(v, d => d.ARRESTS),
@@ -367,100 +367,69 @@ function drawDrugActions(data) {
     const actions = ["FINES", "ARRESTS", "CHARGES"];
     const actionColors = { "FINES": "#2563eb", "ARRESTS": "#ef4444", "CHARGES": "#f59e0b" };
 
-    // ── 2. SCALES & AXES ──
-    const x0 = d3.scaleBand().domain(states).range([0, width]).padding(0.25);
-    const x1 = d3.scaleBand().domain(actions).range([0, x0.bandwidth()]).padding(0.08);
+    // Format data structurally for d3.stack()
+    const formattedData = states.map(state => ({
+        state: state,
+        FINES: stateMap.get(state).FINES,
+        ARRESTS: stateMap.get(state).ARRESTS,
+        CHARGES: stateMap.get(state).CHARGES
+    }));
 
-    const maxVal = d3.max(states, s => d3.max(actions, a => stateMap.get(s)[a])) || 100;
+    // Generate stack layout configurations
+    const stack = d3.stack().keys(actions);
+    const stackedSeries = stack(formattedData);
+
+    // Setup Scales
+    const x = d3.scaleBand().domain(states).range([0, width]).padding(0.35);
+    const maxVal = d3.max(formattedData, d => d.FINES + d.ARRESTS + d.CHARGES) || 100;
     const y = d3.scaleLinear().domain([0, maxVal * 1.1]).range([height, 0]);
 
-    // Background Grid
+    // Background Grid lines
     svg.append("g").attr("class", "grid")
         .call(d3.axisLeft(y).ticks(5).tickSize(-width).tickFormat(""))
         .selectAll("line").style("stroke", "#f1f5f9").style("stroke-dasharray", "4,4");
     svg.select(".grid .domain").remove();
 
-    svg.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x0));
+    // Render Axes
+    svg.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
     svg.append("g").attr("class", "axis")
         .call(d3.axisLeft(y).ticks(5).tickFormat(d => d >= 1000 ? `${(d/1000).toFixed(0)}K` : d));
 
-    // ── 3. RENDER GROUPS & BARS ──
-    const stateGroups = svg.selectAll(".state-group")
-        .data(states).enter().append("g")
-        .attr("class", "state-group")
-        .attr("transform", d => `translate(${x0(d)},0)`);
-
-    stateGroups.selectAll("rect")
-        .data(state => actions.map(action => ({
-            action,
-            state,
-            value: stateMap.get(state)[action]
-        })))
+    // Render Stack Layers
+    svg.selectAll(".layer")
+        .data(stackedSeries).enter().append("g")
+        .attr("class", "layer")
+        .attr("fill", d => actionColors[d.key])
+        .selectAll("rect")
+        .data(d => d.map(item => { item.key = d.key; return item; }))
         .enter().append("rect")
-        .attr("x", d => x1(d.action))
-        .attr("y", height).attr("width", x1.bandwidth()).attr("height", 0).attr("rx", 3)
-        .attr("fill", d => actionColors[d.action])
+        .attr("x", d => x(d.data.state))
+        .attr("y", height)
+        .attr("width", x.bandwidth())
+        .attr("height", 0)
         .on("mouseover", function(event, d) {
-            d3.select(this).attr("opacity", 0.8);
+            d3.select(this).attr("opacity", 0.85);
+            const val = d[1] - d[0];
             drugTooltip.style("opacity", 1)
-                .html(`<strong>${d.state}</strong><br>${d.action}: ${d.value.toLocaleString()}`);
+                .html(`<strong>${d.data.state}</strong><br>${d.key}: ${val.toLocaleString()}`);
         })
         .on("mousemove", function(event) {
             drugTooltip.style("left", (event.pageX + 14) + "px").style("top", (event.pageY - 32) + "px");
         })
-        .on("mouseout", function() { d3.select(this).attr("opacity", 1); drugTooltip.style("opacity", 0); })
-        .transition().duration(700).delay((d,i) => i * 40)
-        .attr("y", d => d.value > 0 ? y(d.value) : height)
-        .attr("height", d => d.value > 0 ? Math.max(height - y(d.value), 3) : 0);
+        .on("mouseout", function() { 
+            d3.select(this).attr("opacity", 1); 
+            drugTooltip.style("opacity", 0); 
+        })
+        .transition().duration(700)
+        .attr("y", d => y(d[1]))
+        .attr("height", d => y(d[0]) - y(d[1]));
 
-    // ── 4. SMART ANNOTATIONS FOR COMPLETELY EMPTY STATES (TAS & VIC) ──
-    states.forEach(state => {
-        const metrics = stateMap.get(state);
-        const totalEnforcements = metrics.FINES + metrics.ARRESTS + metrics.CHARGES;
-        
-        if (totalEnforcements === 0) {
-            // Calculate center of this specific state's column section
-            const stateCenterX = x0(state) + x0.bandwidth() / 2;
-            
-            svg.append("text")
-                .attr("x", stateCenterX)
-                .attr("y", height - 25) // Place it slightly above the baseline
-                .attr("text-anchor", "middle")
-                .attr("font-size", "9px")
-                .attr("font-weight", "500")
-                .attr("fill", "#94a3b8")
-                .attr("font-family", "DM Sans, sans-serif")
-                .style("text-transform", "uppercase")
-                .text("No data");
-
-            svg.append("text")
-                .attr("x", stateCenterX)
-                .attr("y", height - 12)
-                .attr("text-anchor", "middle")
-                .attr("font-size", "9px")
-                .attr("fill", "#cbd5e1")
-                .attr("font-family", "DM Sans, sans-serif")
-                .text("recorded");
-        }
-    });
-
-    // ── 5. EXPLICIT CATEGORY ABSENCE FOOTNOTE ──
-    // Adds a clean, professional data exception notice at the top left of the chart area
-    svg.append("text")
-        .attr("x", 0)
-        .attr("y", -15)
-        .attr("font-size", "11px")
-        .attr("font-style", "italic")
-        .attr("fill", "#64748b")
-        .attr("font-family", "DM Sans, sans-serif")
-        .text("* Note: Fines not reported for ACT, QLD, WA. Arrests not reported for NSW.");
-
-    // ── 6. SIDEBAR LEGEND RENDERER ──
-    const legend = svg.append("g").attr("transform", `translate(${width + 12}, 15)`);
+    // Clean Sidebar Legend Layout Container
+    const legend = svg.append("g").attr("transform", `translate(${width + 25}, 10)`);
     actions.forEach((action, i) => {
         const row = legend.append("g").attr("transform", `translate(0, ${i * 24})`);
         row.append("rect").attr("width", 12).attr("height", 12).attr("rx", 3).attr("fill", actionColors[action]);
-        row.append("text").attr("x", 16).attr("y", 10).attr("font-size", "12px")
+        row.append("text").attr("x", 18).attr("y", 10).attr("font-size", "12px")
             .attr("fill", "#475569").attr("font-family", "DM Sans, sans-serif").text(action);
     });
 }
