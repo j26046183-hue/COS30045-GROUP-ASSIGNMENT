@@ -1,9 +1,9 @@
 // =========================================================================
 // BREATH.JS
 // 3 Charts (Fully Relational & Flat Structured Layout):
-// 1. Historical trend (multi-line) — breath_historical_trend.csv
-// 2. Breath tests by state (horizontal bar) — breath_by_state.csv
-// 3. Enforcement actions by state (grouped bar) — breath_by_state.csv
+// 1. Historical trend (multi-line) — breathHistoricalData
+// 2. Breath tests by state (horizontal bar) — breathStateData (COUNT)
+// 3. Enforcement actions by state (grouped bar) — breathStateData (FINES, ARRESTS, CHARGES)
 // =========================================================================
 
 // Shared Tooltip Instance
@@ -51,43 +51,52 @@ let breathHistoricalData = [];
 let breathStateData = [];
 
 // =========================================================================
-// LOAD CSV FILES AT ONCE (Matching Fines Structure Exactly)
+// MAIN DATA INITIALIZER (To be called from your main app loader)
 // =========================================================================
-Promise.all([
-    d3.csv("data/breath_historical_trend.csv"), // Make sure your filenames in data/ match these exactly!
-    d3.csv("data/breath_by_state.csv")
-]).then(function([historical, byState]) {
+function initBreathTests(rawData) {
+    console.log("Loading Breath Test datasets...");
 
-    // Parse numeric values cleanly
-    historical.forEach(d => {
-        d.YEAR = +d.YEAR;
-        d.COUNT = +d.COUNT || 0;
-    });
+    // Filter raw data stream down strictly to breath-related items
+    const breathData = rawData.filter(d => d.CATEGORY === "BREATH" || d.TYPE === "BREATH");
 
-    byState.forEach(d => {
-        d.COUNT = +d.COUNT || 0;
-        d.FINES = +d.FINES || 0;
-        d.ARRESTS = +d.ARRESTS || 0;
-        d.CHARGES = +d.CHARGES || 0;
-    });
+    if (breathData.length === 0) {
+        console.warn("Warning: No matching breath test records found in source data.");
+        return;
+    }
 
-    breathHistoricalData = historical;
-    breathStateData = byState;
+    // 1. Roll up historical numbers over the full timeframe
+    breathHistoricalData = d3.rollups(breathData, 
+        v => d3.sum(v, d => +d.COUNT || 0),
+        d => d.STATE,
+        d => +d.YEAR
+    ).flatMap(([state, years]) => years.map(([year, count]) => ({ STATE: state, YEAR: year, COUNT: count })));
 
-    // Populate state drop-down filter dynamically
-    const uniqueStates = [...new Set(breathStateData.map(d => d.STATE))].sort();
+    // 2. Roll up active state reporting metrics window (2023-2024)
+    breathStateData = d3.rollups(
+        breathData.filter(d => +d.YEAR === 2023 || +d.YEAR === 2024),
+        v => ({
+            COUNT: d3.sum(v, d => +d.COUNT || 0),
+            FINES: d3.sum(v, d => +d.FINES || 0),
+            ARRESTS: d3.sum(v, d => +d.ARRESTS || 0),
+            CHARGES: d3.sum(v, d => +d.CHARGES || 0)
+        }),
+        d => d.STATE
+    ).map(([state, metrics]) => ({ STATE: state, ...metrics }));
+
+    // Populate drop-down filter elements dynamically
+    const uniqueStates = [...new Set(breathHistoricalData.map(d => d.STATE))].sort();
     const stateFilter = d3.select("#breath-state-filter");
     
     uniqueStates.forEach(s => {
         stateFilter.append("option").attr("value", s).text(s);
     });
 
-    // Wire up change listener events
+    // Wire up events
     d3.select("#breath-state-filter").on("change", applyBreathFilters);
 
-    // Initial load run to draw graphs immediately
+    // Initial load run
     applyBreathFilters();
-});
+}
 
 // =========================================================================
 // CENTRAL INTERACTION ROUTINE: FILTER & AGGREGATE ENGINE
@@ -295,6 +304,7 @@ function drawBreathActions(data) {
         .attr("class", "state-group")
         .attr("transform", d => `translate(${x0(d.STATE)},0)`);
 
+    // Draw active chart rects
     stateGroups.selectAll("rect")
         .data(d => actions.map(action => ({ action, state: d.STATE, value: d[action] })))
         .enter().append("rect")
@@ -336,6 +346,7 @@ function drawBreathActions(data) {
         .transition().duration(700).delay((d,i) => i * 40)
         .attr("y", d => d.value > 0 ? y(d.value) - 7 : height);
 
+    // Append fallback notices for states with unrecorded metric profiles
     data.forEach(d => {
         const total = d.FINES + d.ARRESTS + d.CHARGES;
         if (total === 0) {
@@ -349,6 +360,7 @@ function drawBreathActions(data) {
         }
     });
 
+    // Render legend block panel
     const legend = svg.append("g").attr("transform", `translate(${width + 15}, 15)`);
     actions.forEach((action, i) => {
         const row = legend.append("g").attr("transform", `translate(0, ${i * 24})`);

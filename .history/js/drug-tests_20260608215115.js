@@ -405,7 +405,7 @@ function drawDrugBar(data) {
         .text(d => d.count.toLocaleString());
 }
 
-// ── CHART 4: Enforcement Actions Grouped Bar Layout ──
+/// ── CHART 4: Enforcement Actions Grouped Bar Layout ──
 function drawDrugActions(data) {
     d3.select("#drug-actions-chart").selectAll("*").remove();
     if (data.length === 0) return;
@@ -479,7 +479,7 @@ function drawDrugActions(data) {
         .attr("y", d => d.value > 0 ? y(d.value) : height)
         .attr("height", d => d.value > 0 ? Math.max(height - y(d.value), 3) : 0);
 
-    
+    // --- ADDED CHANGES: GENERATE NUMBERS DIRECTLY ON TOP OF EACH ACTIVE BAR ---
     stateGroups.selectAll(".bar-count-label")
         .data(state => actions.map(action => ({
             action,
@@ -490,8 +490,8 @@ function drawDrugActions(data) {
         .attr("x", d => x1(d.action) + x1.bandwidth() / 2) // Target the horizontal center of the target bar
         .attr("text-anchor", "middle")
         .style("font-family", "DM Sans, sans-serif")
-        .style("font-size", "11px")
-        .style("font-weight", "500")
+        .style("font-size", "9px")
+        .style("font-weight", "600")
         .style("fill", "#475569") // Clean color matching your dashboard axis text
         // Labels start hidden at the baseline to perfectly sync with rect entry animations
         .attr("y", height)
