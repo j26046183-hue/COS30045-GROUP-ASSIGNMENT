@@ -1,3 +1,9 @@
+/**
+ * breath-test.js
+ * Core interactive visualization engine for Breath Test Enforcement metrics.
+ * Tailored explicitly to 2-file structure using real data metrics schema.
+ */
+
 const breathTooltip = d3.select("body").append("div").attr("class", "tooltip");
 
 // Color systems mapping strictly to jurisdictions
@@ -55,16 +61,9 @@ Promise.all([
     const stateFilter = d3.select("#breath-state-filter");
     stateFilter.selectAll("option:not([value='all'])").remove();
     states.forEach(s => stateFilter.append("option").attr("value", s).text(s));
-    
-    const barYearSelect = d3.select("#bar-year-filter");
-    barYearSelect.selectAll("*").remove(); // Prevent duplicates
-    barYearSelect.append("option").attr("value", "all").text("All Years");
-    uniqueYears.forEach(y => barYearSelect.append("option").attr("value", y).text(y));
-    
-    // Hook filter change event listeners
-    d3.select("#breath-state-filter").on("change", applyBreathFilters); 
-    d3.select("#donut-year-filter").on("change", updateDonutOnly);      
-    d3.select("#bar-year-filter").on("change", updateBarOnly);          
+
+    // Hook filter change event listener
+    d3.select("#breath-state-filter").on("change", applyBreathFilters);
 
     // Initial render execution
     applyBreathFilters();
@@ -81,7 +80,7 @@ function applyBreathFilters() {
         filteredHistorical = filteredHistorical.filter(d => d.STATE === selectedState);
     }
 
-    // ── 2. FILTER MODERN GRANULAR STREAM FOR KPIs ──
+    // ── 2. FILTER MODERN GRANULAR STREAM ──
     let filteredModern = breathModernData.slice();
     if (selectedState !== "all") {
         filteredModern = filteredModern.filter(d => d.STATE === selectedState);
@@ -104,7 +103,7 @@ function applyBreathFilters() {
         d => normalizeRegion(d.LOCATION)
     );
     const topRegionObj = Array.from(regionMap, ([region, val]) => ({ region, val }))
-                              .sort((a, b) => b.val - a.val)[0];
+    .sort((a, b) => b.val - a.val)[0];
 
     // Update HTML layout containers dynamically
     d3.select("#breath-total-historical").text(totalHistoricalTests.toLocaleString());
@@ -114,38 +113,10 @@ function applyBreathFilters() {
 
     // ── 4. RE-RENDER ALL VISUALS CLEANLY ──
     drawBreathHistorical(filteredHistorical);
+    drawBreathRegionalDonut(filteredModern);
     
-    // FIXED: Instead of evaluating charts twice with old variables, let local functions draw them independently
-    updateDonutOnly();
-    updateBarOnly();
-}
-
-// UPDATES ONLY THE DONUT CHART
-function updateDonutOnly() {
-    const selectedState = d3.select("#breath-state-filter").property("value") || "all";
-    const selectedYear = d3.select("#donut-year-filter").property("value") || "all"; 
-
-    // FIXED: Target breathModernData source stream instead of broken master definition
-    let filtered = breathModernData.slice();
-    if (selectedState !== "all") filtered = filtered.filter(d => d.STATE === selectedState);
-    if (selectedYear !== "all") filtered = filtered.filter(d => d.YEAR === +selectedYear);
-
-    // Render only the donut chart
-    drawBreathRegionalDonut(filtered);
-}
-
-// UPDATES ONLY THE BAR CHART
-function updateBarOnly() {
-    const selectedState = d3.select("#breath-state-filter").property("value") || "all";
-    const selectedYear = d3.select("#bar-year-filter").property("value") || "all"; 
-
-    // FIXED: Target breathModernData source stream instead of broken master definition
-    let filtered = breathModernData.slice();
-    if (selectedState !== "all") filtered = filtered.filter(d => d.STATE === selectedState);
-    if (selectedYear !== "all") filtered = filtered.filter(d => d.YEAR === +selectedYear);
-
-    // Render only the bar chart
-    renderBreathBarChart(filtered);
+    // FIXED: Changed 'filteredData' to 'filteredModern' so D3 can process the dataset
+    renderBreathBarChart(filteredModern); 
 }
 
 // ── CHART 1: Historical Trend (Line Chart) ──
@@ -243,6 +214,7 @@ function drawBreathRegionalDonut(data) {
 
     const regions = ["Major Cities", "Inner Regional", "Outer Regional", "Remote", "Very Remote"];
     
+    // Parse location strings from your explicit layout pattern
     const totals = regions.map(region => {
         const matchingRows = data.filter(d => {
             if (!d.LOCATION) return false;
@@ -315,8 +287,10 @@ function drawBreathRegionalDonut(data) {
     legendG.attr("transform", `translate(${(width - bounds.width) / 2}, ${(radius * 2) + margin.top + 20})`);
 }
 
-// Function to render the Demographics Bar Chart
+// Function to render the new Demographics Bar Chart
+// Function to render the new Demographics Bar Chart
 function renderBreathBarChart(data) {
+    // 1. Clear any old chart content
     const container = d3.select("#breath-bar-chart");
     container.selectAll("*").remove();
 
@@ -325,20 +299,32 @@ function renderBreathBarChart(data) {
         return;
     }
 
+    // ── DEBUGGING LOGS ──
+    // Open your browser inspector (F12) to see exactly what columns your CSV uses!
+    console.log("Bar Chart Data Sample:", data[0]);
+
+    // 2. Setup dynamic width and height based on the card container
     const margin = { top: 30, right: 30, bottom: 65, left: 75 };
     const width = container.node().getBoundingClientRect().width - margin.left - margin.right || 450;
     const height = 320 - margin.top - margin.bottom;
 
+    // 3. Append the SVG element
     const svg = container.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+    // 4. SMART AUTO-DETECT FIELDS
+    // Scans your actual CSV to find keys containing 'age', 'category', 'count', or 'tests'
     const csvKeys = Object.keys(data[0]);
+    
     const groupField = csvKeys.find(k => k.toLowerCase().includes('age') || k.toLowerCase().includes('category') || k.toLowerCase().includes('demographic')) || csvKeys[0];
     const valueField = csvKeys.find(k => k.toLowerCase().includes('positive') || k.toLowerCase().includes('count') || k.toLowerCase().includes('value')) || "COUNT";
 
+    console.log(`Bar Chart aggregating field [${groupField}] using numeric volume from [${valueField}]`);
+
+    // Aggregate and process data
     let rolledData = d3.rollups(
         data,
         v => d3.sum(v, d => +d[valueField] || 0),
@@ -346,6 +332,7 @@ function renderBreathBarChart(data) {
     ).map(([key, value]) => ({ key: key || "Unknown", value }))
      .filter(d => d.key !== "Unknown" && d.key !== "undefined" && d.value > 0);
 
+    // If no aggregated data could be formed, display helper text on screen
     if (rolledData.length === 0) {
         svg.append("text")
             .attr("x", width / 2)
@@ -357,14 +344,24 @@ function renderBreathBarChart(data) {
         return;
     }
 
+    // Sort bars from highest to lowest volume
     rolledData.sort((a, b) => b.value - a.value);
 
-    const x = d3.scaleBand().domain(rolledData.map(d => d.key)).range([0, width]).padding(0.3);
-    const y = d3.scaleLinear().domain([0, d3.max(rolledData, d => d.value) * 1.1]).range([height, 0]);
+    // 5. Create Scales
+    const x = d3.scaleBand()
+        .domain(rolledData.map(d => d.key))
+        .range([0, width])
+        .padding(0.3);
 
-    const barColor = "#ea580c"; 
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(rolledData, d => d.value) * 1.1]) // Add 10% headroom
+        .range([height, 0]);
+
+    // 6. Colors matching dashboard theme
+    const barColor = "#ea580c"; // Warm Orange accent matching modern incidents
     const hoverColor = "#b45309";
 
+    // 7. Add X Axis
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(x))
@@ -377,6 +374,7 @@ function renderBreathBarChart(data) {
         .style("font-size", "11px")
         .style("fill", "#64748b");
 
+    // 8. Add Y Axis
     svg.append("g")
         .call(d3.axisLeft(y).ticks(5).tickFormat(d => {
             if (d >= 1000000) return `${(d/1000000).toFixed(1)}M`;
@@ -387,6 +385,7 @@ function renderBreathBarChart(data) {
         .style("font-size", "11px")
         .style("fill", "#64748b");
 
+    // 9. Render the Bars with Transitions
     svg.selectAll(".bar")
         .data(rolledData)
         .enter()

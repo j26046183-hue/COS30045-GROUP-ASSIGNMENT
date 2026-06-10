@@ -56,6 +56,14 @@ Promise.all([
     stateFilter.selectAll("option:not([value='all'])").remove();
     states.forEach(s => stateFilter.append("option").attr("value", s).text(s));
     
+    // FIXED: Extracted unique years from the valid modern array instead of undefined "data"
+    const uniqueYears = [...new Set(modern.map(d => d.YEAR))].filter(y => y).sort((a, b) => b - a);
+
+    const donutYearSelect = d3.select("#donut-year-filter");
+    donutYearSelect.selectAll("*").remove(); // Prevent duplicates
+    donutYearSelect.append("option").attr("value", "all").text("All Years");
+    uniqueYears.forEach(y => donutYearSelect.append("option").attr("value", y).text(y));
+
     const barYearSelect = d3.select("#bar-year-filter");
     barYearSelect.selectAll("*").remove(); // Prevent duplicates
     barYearSelect.append("option").attr("value", "all").text("All Years");
@@ -227,6 +235,7 @@ function drawBreathHistorical(data) {
 }
 
 // ── CHART 2: Spatial Regional Distribution (Doughnut Wheel) ──
+// ── CHART 2: Spatial Regional Distribution (Doughnut Wheel) ──
 function drawBreathRegionalDonut(data) {
     d3.select("#breath-donut-chart").selectAll("*").remove();
 
@@ -241,21 +250,25 @@ function drawBreathRegionalDonut(data) {
     const svg = d3.select("#breath-donut-chart").append("svg").attr("width", width).attr("height", height);
     const chartG = svg.append("g").attr("transform", `translate(${width / 2}, ${radius + margin.top})`);
 
-    const regions = ["Major Cities", "Inner Regional", "Outer Regional", "Remote", "Very Remote"];
-    
-    const totals = regions.map(region => {
-        const matchingRows = data.filter(d => {
-            if (!d.LOCATION) return false;
-            const normalized = d.LOCATION.replace(" of Australia", "").replace(" Australia", "").trim();
-            return normalized.toLowerCase() === region.toLowerCase();
-        });
+    // UPDATED: Dynamically extract whatever regions actually exist in your filtered dataset rows
+    const uniqueLocations = [...new Set(data.map(d => d.LOCATION || "Unknown"))].filter(l => l.trim() !== "");
+
+    const totals = uniqueLocations.map(region => {
+        const matchingRows = data.filter(d => (d.LOCATION || "Unknown") === region);
         return {
-            region,
+            region: region,
             value: d3.sum(matchingRows, d => d.COUNT)
         };
     });
 
     const totalVolume = d3.sum(totals, d => d.value);
+
+    // Dynamic color assignment fallback if name isn't in regionalColors map
+    const getRegionColor = (regionName) => {
+        if (regionName === "All regions") return "#0284c7"; // Sky blue
+        if (regionName === "Unknown") return "#64748b";     // Slate gray
+        return "#0d9488"; // Teal fallback for any other string values
+    };
 
     if (totalVolume === 0) {
         chartG.append("text").attr("text-anchor", "middle")
@@ -271,7 +284,7 @@ function drawBreathRegionalDonut(data) {
     chartG.selectAll(".arc")
         .data(pie(totals.filter(d => d.value > 0))).enter().append("path")
         .attr("class", "arc").attr("d", arc)
-        .attr("fill", d => regionalColors[d.data.region] || "#cbd5e1")
+        .attr("fill", d => getRegionColor(d.data.region))
         .attr("stroke", "white").attr("stroke-width", 2.5)
         .on("mouseover", function(event, d) {
             d3.select(this).attr("d", arcHover);
@@ -295,15 +308,16 @@ function drawBreathRegionalDonut(data) {
     chartG.append("text").attr("text-anchor", "middle").attr("dy", "1.3em")
         .attr("font-size", "10px").attr("font-weight", "500")
         .attr("font-family", "DM Sans, sans-serif").attr("fill", "#94a3b8")
-        .text("Modern Incidents");
+        .text("Total Volume");
 
+    // Render Dynamic Legend
     const legendG = svg.append("g").attr("class", "donut-legend");
     let currentX = 0, currentY = 0;
-    const spacingX = 130, spacingY = 18;
+    const spacingX = 140, spacingY = 18;
 
     totals.forEach((d, i) => {
         const itemG = legendG.append("g").attr("transform", `translate(${currentX}, ${currentY})`);
-        itemG.append("rect").attr("width", 10).attr("height", 10).attr("rx", 2).attr("fill", regionalColors[d.region]);
+        itemG.append("rect").attr("width", 10).attr("height", 10).attr("rx", 2).attr("fill", getRegionColor(d.region));
         itemG.append("text").attr("x", 15).attr("y", 9).attr("font-size", "11px")
              .attr("fill", "#475569").attr("font-family", "DM Sans, sans-serif").text(d.region);
 

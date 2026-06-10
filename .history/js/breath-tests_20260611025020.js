@@ -56,6 +56,7 @@ Promise.all([
     stateFilter.selectAll("option:not([value='all'])").remove();
     states.forEach(s => stateFilter.append("option").attr("value", s).text(s));
     
+    
     const barYearSelect = d3.select("#bar-year-filter");
     barYearSelect.selectAll("*").remove(); // Prevent duplicates
     barYearSelect.append("option").attr("value", "all").text("All Years");

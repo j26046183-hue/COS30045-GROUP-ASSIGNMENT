@@ -1,3 +1,9 @@
+/**
+ * breath-test.js
+ * Core interactive visualization engine for Breath Test Enforcement metrics.
+ * Tailored explicitly to 2-file structure using real data metrics schema.
+ */
+
 const breathTooltip = d3.select("body").append("div").attr("class", "tooltip");
 
 // Color systems mapping strictly to jurisdictions
@@ -55,16 +61,9 @@ Promise.all([
     const stateFilter = d3.select("#breath-state-filter");
     stateFilter.selectAll("option:not([value='all'])").remove();
     states.forEach(s => stateFilter.append("option").attr("value", s).text(s));
-    
-    const barYearSelect = d3.select("#bar-year-filter");
-    barYearSelect.selectAll("*").remove(); // Prevent duplicates
-    barYearSelect.append("option").attr("value", "all").text("All Years");
-    uniqueYears.forEach(y => barYearSelect.append("option").attr("value", y).text(y));
-    
-    // Hook filter change event listeners
-    d3.select("#breath-state-filter").on("change", applyBreathFilters); 
-    d3.select("#donut-year-filter").on("change", updateDonutOnly);      
-    d3.select("#bar-year-filter").on("change", updateBarOnly);          
+
+    // Hook filter change event listener
+    d3.select("#breath-state-filter").on("change", applyBreathFilters);
 
     // Initial render execution
     applyBreathFilters();
@@ -81,7 +80,7 @@ function applyBreathFilters() {
         filteredHistorical = filteredHistorical.filter(d => d.STATE === selectedState);
     }
 
-    // ── 2. FILTER MODERN GRANULAR STREAM FOR KPIs ──
+    // ── 2. FILTER MODERN GRANULAR STREAM ──
     let filteredModern = breathModernData.slice();
     if (selectedState !== "all") {
         filteredModern = filteredModern.filter(d => d.STATE === selectedState);
@@ -114,38 +113,8 @@ function applyBreathFilters() {
 
     // ── 4. RE-RENDER ALL VISUALS CLEANLY ──
     drawBreathHistorical(filteredHistorical);
-    
-    // FIXED: Instead of evaluating charts twice with old variables, let local functions draw them independently
-    updateDonutOnly();
-    updateBarOnly();
-}
-
-// UPDATES ONLY THE DONUT CHART
-function updateDonutOnly() {
-    const selectedState = d3.select("#breath-state-filter").property("value") || "all";
-    const selectedYear = d3.select("#donut-year-filter").property("value") || "all"; 
-
-    // FIXED: Target breathModernData source stream instead of broken master definition
-    let filtered = breathModernData.slice();
-    if (selectedState !== "all") filtered = filtered.filter(d => d.STATE === selectedState);
-    if (selectedYear !== "all") filtered = filtered.filter(d => d.YEAR === +selectedYear);
-
-    // Render only the donut chart
-    drawBreathRegionalDonut(filtered);
-}
-
-// UPDATES ONLY THE BAR CHART
-function updateBarOnly() {
-    const selectedState = d3.select("#breath-state-filter").property("value") || "all";
-    const selectedYear = d3.select("#bar-year-filter").property("value") || "all"; 
-
-    // FIXED: Target breathModernData source stream instead of broken master definition
-    let filtered = breathModernData.slice();
-    if (selectedState !== "all") filtered = filtered.filter(d => d.STATE === selectedState);
-    if (selectedYear !== "all") filtered = filtered.filter(d => d.YEAR === +selectedYear);
-
-    // Render only the bar chart
-    renderBreathBarChart(filtered);
+    drawBreathRegionalDonut(filteredModern);
+    drawBreathDemographicRadar(filteredModern);
 }
 
 // ── CHART 1: Historical Trend (Line Chart) ──
@@ -243,6 +212,7 @@ function drawBreathRegionalDonut(data) {
 
     const regions = ["Major Cities", "Inner Regional", "Outer Regional", "Remote", "Very Remote"];
     
+    // Parse location strings from your explicit layout pattern
     const totals = regions.map(region => {
         const matchingRows = data.filter(d => {
             if (!d.LOCATION) return false;
@@ -315,56 +285,53 @@ function drawBreathRegionalDonut(data) {
     legendG.attr("transform", `translate(${(width - bounds.width) / 2}, ${(radius * 2) + margin.top + 20})`);
 }
 
-// Function to render the Demographics Bar Chart
+// Function to render the new Demographics Bar Chart
 function renderBreathBarChart(data) {
+    // 1. Clear any old chart content
     const container = d3.select("#breath-bar-chart");
     container.selectAll("*").remove();
 
-    if (!data || data.length === 0) {
-        console.warn("Bar chart received an empty data array.");
-        return;
-    }
-
-    const margin = { top: 30, right: 30, bottom: 65, left: 75 };
+    // 2. Setup dynamic width and height based on the card container
+    const margin = { top: 30, right: 30, bottom: 50, left: 60 };
     const width = container.node().getBoundingClientRect().width - margin.left - margin.right || 450;
     const height = 320 - margin.top - margin.bottom;
 
+    // 3. Append the SVG element
     const svg = container.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    const csvKeys = Object.keys(data[0]);
-    const groupField = csvKeys.find(k => k.toLowerCase().includes('age') || k.toLowerCase().includes('category') || k.toLowerCase().includes('demographic')) || csvKeys[0];
-    const valueField = csvKeys.find(k => k.toLowerCase().includes('positive') || k.toLowerCase().includes('count') || k.toLowerCase().includes('value')) || "COUNT";
-
+    // 4. Aggregate and process data (Grouping by Age Group / Category)
+    // Replace 'Age_Group' or 'Category' with whatever column name matches your CSV
+    const groupField = data[0].hasOwnProperty('Age_Group') ? 'Age_Group' : 'Category';
+    
     let rolledData = d3.rollups(
         data,
-        v => d3.sum(v, d => +d[valueField] || 0),
+        v => d3.sum(v, d => +d.Positive_Tests || +d.Value || 0),
         d => d[groupField]
-    ).map(([key, value]) => ({ key: key || "Unknown", value }))
-     .filter(d => d.key !== "Unknown" && d.key !== "undefined" && d.value > 0);
+    ).map(([key, value]) => ({ key, value }))
+     .filter(d => d.key && d.key !== "Unknown" && d.key !== "undefined");
 
-    if (rolledData.length === 0) {
-        svg.append("text")
-            .attr("x", width / 2)
-            .attr("y", height / 2)
-            .attr("text-anchor", "middle")
-            .style("font-family", "DM Sans, sans-serif")
-            .style("fill", "#64748b")
-            .text("No matching demographic values found.");
-        return;
-    }
-
+    // Sort bars from highest to lowest volume
     rolledData.sort((a, b) => b.value - a.value);
 
-    const x = d3.scaleBand().domain(rolledData.map(d => d.key)).range([0, width]).padding(0.3);
-    const y = d3.scaleLinear().domain([0, d3.max(rolledData, d => d.value) * 1.1]).range([height, 0]);
+    // 5. Create Scales
+    const x = d3.scaleBand()
+        .domain(rolledData.map(d => d.key))
+        .range([0, width])
+        .padding(0.3);
 
-    const barColor = "#ea580c"; 
-    const hoverColor = "#b45309";
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(rolledData, d => d.value) * 1.1]) // Add 10% headroom
+        .range([height, 0]);
 
+    // 6. Colors matching your dashboard theme (Orange accents for breath tests)
+    const barColor = "#f97316"; 
+    const hoverColor = "#ea580c";
+
+    // 7. Add X Axis
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(x))
@@ -372,21 +339,37 @@ function renderBreathBarChart(data) {
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
         .attr("dy", ".15em")
-        .attr("transform", "rotate(-25)") 
+        .attr("transform", "rotate(-25)") // Slanted labels so they don't overlap
         .style("font-family", "'DM Sans', sans-serif")
         .style("font-size", "11px")
-        .style("fill", "#64748b");
+        .style("color", "#64748b");
 
+    // 8. Add Y Axis
     svg.append("g")
-        .call(d3.axisLeft(y).ticks(5).tickFormat(d => {
-            if (d >= 1000000) return `${(d/1000000).toFixed(1)}M`;
-            if (d >= 1000) return `${(d/1000).toFixed(0)}K`;
-            return d;
-        }))
+        .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(",")))
         .style("font-family", "'DM Sans', sans-serif")
         .style("font-size", "11px")
-        .style("fill", "#64748b");
+        .style("color", "#64748b");
 
+    // 9. Create Tooltip container if it doesn't exist
+    let tooltip = d3.select(".chart-tooltip");
+    if (tooltip.empty()) {
+        tooltip = d3.select("body").append("div")
+            .attr("class", "chart-tooltip")
+            .style("position", "absolute")
+            .style("visibility", "hidden")
+            .style("background-color", "#1e293b")
+            .style("color", "#fff")
+            .style("padding", "8px 12px")
+            .style("border-radius", "6px")
+            .style("font-family", "'DM Sans', sans-serif")
+            .style("font-size", "12px")
+            .style("pointer-events", "none")
+            .style("box-shadow", "0 4px 6px -1px rgba(0,0,0,0.1)")
+            .style("z-index", "1000");
+    }
+
+    // 10. Render the Bars with Transitions
     svg.selectAll(".bar")
         .data(rolledData)
         .enter()
@@ -394,24 +377,24 @@ function renderBreathBarChart(data) {
         .attr("class", "bar")
         .attr("x", d => x(d.key))
         .attr("width", x.bandwidth())
-        .attr("y", height)
+        .attr("y", height) // Start down at base line for transition animation
         .attr("height", 0)
         .attr("fill", barColor)
-        .attr("rx", 4)
+        .attr("rx", 4) // Rounded top corners
         .on("mouseover", function(event, d) {
             d3.select(this).attr("fill", hoverColor);
-            breathTooltip.style("opacity", 1)
-                .html(`<strong>${d.key}</strong><br>Incidents: ${d.value.toLocaleString()}`);
+            tooltip.style("visibility", "visible")
+                .html(`<strong>${d.key}</strong><br>Positive Tests: ${d.value.toLocaleString()}`);
         })
         .on("mousemove", function(event) {
-            breathTooltip.style("left", (event.pageX + 14) + "px")
-                         .style("top", (event.pageY - 32) + "px");
+            tooltip.style("top", (event.pageY - 40) + "px")
+                   .style("left", (event.pageX + 15) + "px");
         })
         .on("mouseout", function() {
             d3.select(this).attr("fill", barColor);
-            breathTooltip.style("opacity", 0);
+            tooltip.style("visibility", "hidden");
         })
-        .transition()
+        .transition() // Growth animation
         .duration(800)
         .attr("y", d => y(d.value))
         .attr("height", d => height - y(d.value));

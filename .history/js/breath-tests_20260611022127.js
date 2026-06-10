@@ -56,6 +56,14 @@ Promise.all([
     stateFilter.selectAll("option:not([value='all'])").remove();
     states.forEach(s => stateFilter.append("option").attr("value", s).text(s));
     
+    // FIXED: Extracted unique years from the valid modern array instead of undefined "data"
+    const uniqueYears = [...new Set(modern.map(d => d.YEAR))].filter(y => y).sort((a, b) => b - a);
+
+    const donutYearSelect = d3.select("#donut-year-filter");
+    donutYearSelect.selectAll("*").remove(); // Prevent duplicates
+    donutYearSelect.append("option").attr("value", "all").text("All Years");
+    uniqueYears.forEach(y => donutYearSelect.append("option").attr("value", y).text(y));
+
     const barYearSelect = d3.select("#bar-year-filter");
     barYearSelect.selectAll("*").remove(); // Prevent duplicates
     barYearSelect.append("option").attr("value", "all").text("All Years");
@@ -235,27 +243,31 @@ function drawBreathRegionalDonut(data) {
 
     const width = container.offsetWidth;
     const height = 320;
-    const margin = { top: 20, right: 20, bottom: 65, left: 20 };
+    const margin = { top: 20, right: 20, bottom: 85, left: 20 };
     const radius = Math.min(width - margin.left - margin.right, height - margin.top - margin.bottom) / 2;
 
     const svg = d3.select("#breath-donut-chart").append("svg").attr("width", width).attr("height", height);
     const chartG = svg.append("g").attr("transform", `translate(${width / 2}, ${radius + margin.top})`);
 
-    const regions = ["Major Cities", "Inner Regional", "Outer Regional", "Remote", "Very Remote"];
-    
-    const totals = regions.map(region => {
-        const matchingRows = data.filter(d => {
-            if (!d.LOCATION) return false;
-            const normalized = d.LOCATION.replace(" of Australia", "").replace(" Australia", "").trim();
-            return normalized.toLowerCase() === region.toLowerCase();
-        });
+    // FIXED: Dynamically capture whatever unique regions actually exist inside your data array rows
+    const uniqueLocations = [...new Set(data.map(d => d.LOCATION || "Unknown"))].filter(l => l.trim() !== "");
+
+    const totals = uniqueLocations.map(region => {
+        const matchingRows = data.filter(d => (d.LOCATION || "Unknown") === region);
         return {
-            region,
-            value: d3.sum(matchingRows, d => d.COUNT)
+            region: region,
+            value: d3.sum(matchingRows, d => +d.COUNT || 0)
         };
-    });
+    }).filter(d => d.value > 0); // Drop zero categories cleanly
 
     const totalVolume = d3.sum(totals, d => d.value);
+
+    // FIXED: Safe dynamic hex color fallback configuration matching your UI palette
+    const getRegionColor = (regionName) => {
+        if (regionName === "All regions") return "#0284c7"; // Sky Blue
+        if (regionName === "Unknown") return "#64748b";     // Slate Gray
+        return "#0d9488"; // Teal theme default
+    };
 
     if (totalVolume === 0) {
         chartG.append("text").attr("text-anchor", "middle")
@@ -269,22 +281,26 @@ function drawBreathRegionalDonut(data) {
     const arcHover = d3.arc().innerRadius(radius * 0.60).outerRadius(radius * 1.05);
 
     chartG.selectAll(".arc")
-        .data(pie(totals.filter(d => d.value > 0))).enter().append("path")
+        .data(pie(totals)).enter().append("path")
         .attr("class", "arc").attr("d", arc)
-        .attr("fill", d => regionalColors[d.data.region] || "#cbd5e1")
+        .attr("fill", d => getRegionColor(d.data.region))
         .attr("stroke", "white").attr("stroke-width", 2.5)
         .on("mouseover", function(event, d) {
             d3.select(this).attr("d", arcHover);
             const percentage = ((d.data.value / totalVolume) * 100).toFixed(1);
-            breathTooltip.style("opacity", 1)
-                .html(`<strong>${d.data.region}</strong><br>Tests: ${d.data.value.toLocaleString()}<br>Share: ${percentage}%`);
+            if (typeof breathTooltip !== "undefined") {
+                breathTooltip.style("opacity", 1)
+                    .html(`<strong>${d.data.region}</strong><br>Tests: ${d.data.value.toLocaleString()}<br>Share: ${percentage}%`);
+            }
         })
         .on("mousemove", function(event) {
-            breathTooltip.style("left", (event.pageX + 14) + "px").style("top", (event.pageY - 32) + "px");
+            if (typeof breathTooltip !== "undefined") {
+                breathTooltip.style("left", (event.pageX + 14) + "px").style("top", (event.pageY - 32) + "px");
+            }
         })
         .on("mouseout", function() {
             d3.select(this).attr("d", arc);
-            breathTooltip.style("opacity", 0);
+            if (typeof breathTooltip !== "undefined") breathTooltip.style("opacity", 0);
         });
 
     chartG.append("text").attr("text-anchor", "middle").attr("dy", "-0.2em")
@@ -295,20 +311,21 @@ function drawBreathRegionalDonut(data) {
     chartG.append("text").attr("text-anchor", "middle").attr("dy", "1.3em")
         .attr("font-size", "10px").attr("font-weight", "500")
         .attr("font-family", "DM Sans, sans-serif").attr("fill", "#94a3b8")
-        .text("Modern Incidents");
+        .text("Total Tests");
 
+    // FIXED: Dynamic legend bounding calculations so labels don't get truncated
     const legendG = svg.append("g").attr("class", "donut-legend");
     let currentX = 0, currentY = 0;
-    const spacingX = 130, spacingY = 18;
+    const spacingX = 140, spacingY = 18;
 
     totals.forEach((d, i) => {
         const itemG = legendG.append("g").attr("transform", `translate(${currentX}, ${currentY})`);
-        itemG.append("rect").attr("width", 10).attr("height", 10).attr("rx", 2).attr("fill", regionalColors[d.region]);
+        itemG.append("rect").attr("width", 10).attr("height", 10).attr("rx", 2).attr("fill", getRegionColor(d.region));
         itemG.append("text").attr("x", 15).attr("y", 9).attr("font-size", "11px")
              .attr("fill", "#475569").attr("font-family", "DM Sans, sans-serif").text(d.region);
 
-        if (i % 2 === 0) { currentX += spacingX; } 
-        else { currentX = 0; currentY += spacingY; }
+        if ((i + 1) % 2 === 0) { currentX = 0; currentY += spacingY; } 
+        else { currentX += spacingX; }
     });
 
     const bounds = legendG.node().getBBox();
@@ -400,16 +417,20 @@ function renderBreathBarChart(data) {
         .attr("rx", 4)
         .on("mouseover", function(event, d) {
             d3.select(this).attr("fill", hoverColor);
-            breathTooltip.style("opacity", 1)
-                .html(`<strong>${d.key}</strong><br>Incidents: ${d.value.toLocaleString()}`);
+            if (typeof breathTooltip !== "undefined") {
+                breathTooltip.style("opacity", 1)
+                    .html(`<strong>${d.key}</strong><br>Incidents: ${d.value.toLocaleString()}`);
+            }
         })
         .on("mousemove", function(event) {
-            breathTooltip.style("left", (event.pageX + 14) + "px")
-                         .style("top", (event.pageY - 32) + "px");
+            if (typeof breathTooltip !== "undefined") {
+                breathTooltip.style("left", (event.pageX + 14) + "px")
+                             .style("top", (event.pageY - 32) + "px");
+            }
         })
         .on("mouseout", function() {
             d3.select(this).attr("fill", barColor);
-            breathTooltip.style("opacity", 0);
+            if (typeof breathTooltip !== "undefined") breathTooltip.style("opacity", 0);
         })
         .transition()
         .duration(800)

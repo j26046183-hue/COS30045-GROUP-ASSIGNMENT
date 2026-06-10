@@ -56,6 +56,14 @@ Promise.all([
     stateFilter.selectAll("option:not([value='all'])").remove();
     states.forEach(s => stateFilter.append("option").attr("value", s).text(s));
     
+    // FIXED: Extracted unique years from the valid modern array instead of undefined "data"
+    const uniqueYears = [...new Set(modern.map(d => d.YEAR))].filter(y => y).sort((a, b) => b - a);
+
+    const donutYearSelect = d3.select("#donut-year-filter");
+    donutYearSelect.selectAll("*").remove(); // Prevent duplicates
+    donutYearSelect.append("option").attr("value", "all").text("All Years");
+    uniqueYears.forEach(y => donutYearSelect.append("option").attr("value", y).text(y));
+
     const barYearSelect = d3.select("#bar-year-filter");
     barYearSelect.selectAll("*").remove(); // Prevent duplicates
     barYearSelect.append("option").attr("value", "all").text("All Years");
@@ -227,7 +235,9 @@ function drawBreathHistorical(data) {
 }
 
 // ── CHART 2: Spatial Regional Distribution (Doughnut Wheel) ──
+// ── CHART 2: Spatial Regional Distribution (Doughnut Wheel) ──
 function drawBreathRegionalDonut(data) {
+    // 1. Reset and select elements securely
     d3.select("#breath-donut-chart").selectAll("*").remove();
 
     const container = document.getElementById("breath-donut-chart");
@@ -235,184 +245,151 @@ function drawBreathRegionalDonut(data) {
 
     const width = container.offsetWidth;
     const height = 320;
-    const margin = { top: 20, right: 20, bottom: 65, left: 20 };
+    const margin = { top: 20, right: 20, bottom: 80, left: 20 };
     const radius = Math.min(width - margin.left - margin.right, height - margin.top - margin.bottom) / 2;
 
-    const svg = d3.select("#breath-donut-chart").append("svg").attr("width", width).attr("height", height);
-    const chartG = svg.append("g").attr("transform", `translate(${width / 2}, ${radius + margin.top})`);
+    const svg = d3.select("#breath-donut-chart")
+                  .append("svg")
+                  .attr("width", width)
+                  .attr("height", height);
 
-    const regions = ["Major Cities", "Inner Regional", "Outer Regional", "Remote", "Very Remote"];
-    
-    const totals = regions.map(region => {
-        const matchingRows = data.filter(d => {
-            if (!d.LOCATION) return false;
-            const normalized = d.LOCATION.replace(" of Australia", "").replace(" Australia", "").trim();
-            return normalized.toLowerCase() === region.toLowerCase();
-        });
-        return {
-            region,
-            value: d3.sum(matchingRows, d => d.COUNT)
-        };
-    });
+    const chartG = svg.append("g")
+                      .attr("transform", `translate(${width / 2}, ${radius + margin.top})`);
+
+    // Helper to sanitize name strings (e.g., "Major Cities of Australia" -> "Major Cities")
+    const cleanLabel = (str) => {
+        if (!str) return "Unknown";
+        let clean = str.replace(/\s+of\s+Australia/gi, "").trim();
+        return clean.charAt(0).toUpperCase() + clean.slice(1);
+    };
+
+    // 2. Extract and Aggregate Counts based on cleaned keys
+    const countsMap = d3.rollup(
+        data,
+        v => d3.sum(v, d => +d.COUNT || 0),
+        d => cleanLabel(d.LOCATION)
+    );
+
+    // Convert map to layout array structure
+    let totals = Array.from(countsMap, ([region, value]) => ({ region, value }));
+
+    // Remove empty strings or dead zero entries to prevent pie layout distortion
+    totals = totals.filter(d => d.value > 0);
 
     const totalVolume = d3.sum(totals, d => d.value);
 
-    if (totalVolume === 0) {
-        chartG.append("text").attr("text-anchor", "middle")
-            .attr("font-size", "13px").attr("fill", "#94a3b8")
-            .attr("font-family", "DM Sans, sans-serif").text("No Spatial Data Reported");
+    // 3. Fail-safe Fallback UI if data totals collapse to 0
+    if (totalVolume === 0 || totals.length === 0) {
+        chartG.append("text")
+              .attr("text-anchor", "middle")
+              .attr("font-size", "14px")
+              .attr("fill", "#94a3b8")
+              .attr("font-family", "DM Sans, sans-serif")
+              .text("No Spatial Data Recorded for Selection");
         return;
     }
 
-    const pie = d3.pie().value(d => d.value).sort(null);
-    const arc = d3.arc().innerRadius(radius * 0.60).outerRadius(radius);
-    const arcHover = d3.arc().innerRadius(radius * 0.60).outerRadius(radius * 1.05);
+    // 4. Color Palette configuration matching design token scheme
+    const baseColors = {
+        "Major Cities": "#0f766e",   // Teal 700
+        "Inner Regional": "#0d9488",  // Teal 600
+        "Outer Regional": "#2dd4bf",  // Teal 400
+        "Remote": "#99f6e4",          // Teal 200
+        "Very Remote": "#ccfbf1",     // Teal 100
+        "All regions": "#38bdf8",     // Sky Blue
+        "Unknown": "#94a3b8"          // Slate Gray
+    };
 
+    const getHexColor = (name) => baseColors[name] || d3.scaleOrdinal(d3.schemeTeal[5])(name);
+
+    // 5. Build Pie Generator layout
+    const pie = d3.pie().value(d => d.value).sort(null);
+    const arc = d3.arc().innerRadius(radius * 0.58).outerRadius(radius);
+    const arcHover = d3.arc().innerRadius(radius * 0.58).outerRadius(radius * 1.06);
+
+    // Render out paths
     chartG.selectAll(".arc")
-        .data(pie(totals.filter(d => d.value > 0))).enter().append("path")
-        .attr("class", "arc").attr("d", arc)
-        .attr("fill", d => regionalColors[d.data.region] || "#cbd5e1")
-        .attr("stroke", "white").attr("stroke-width", 2.5)
+        .data(pie(totals))
+        .enter()
+        .append("path")
+        .attr("class", "arc")
+        .attr("d", arc)
+        .attr("fill", d => getHexColor(d.data.region))
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 2)
         .on("mouseover", function(event, d) {
-            d3.select(this).attr("d", arcHover);
-            const percentage = ((d.data.value / totalVolume) * 100).toFixed(1);
-            breathTooltip.style("opacity", 1)
-                .html(`<strong>${d.data.region}</strong><br>Tests: ${d.data.value.toLocaleString()}<br>Share: ${percentage}%`);
+            d3.select(this).transition().duration(150).attr("d", arcHover);
+            const pct = ((d.data.value / totalVolume) * 100).toFixed(1);
+            
+            // Ensure you have global 'breathTooltip' configured elsewhere in your script
+            if (typeof breathTooltip !== "undefined") {
+                breathTooltip.style("opacity", 1)
+                    .html(`<strong>${d.data.region}</strong><br/>Tests: ${d.data.value.toLocaleString()}<br/>Share: ${pct}%`);
+            }
         })
         .on("mousemove", function(event) {
-            breathTooltip.style("left", (event.pageX + 14) + "px").style("top", (event.pageY - 32) + "px");
+            if (typeof breathTooltip !== "undefined") {
+                breathTooltip.style("left", (event.pageX + 12) + "px")
+                             .style("top", (event.pageY - 28) + "px");
+            }
         })
         .on("mouseout", function() {
-            d3.select(this).attr("d", arc);
-            breathTooltip.style("opacity", 0);
+            d3.select(this).transition().duration(150).attr("d", arc);
+            if (typeof breathTooltip !== "undefined") {
+                breathTooltip.style("opacity", 0);
+            }
         });
 
-    chartG.append("text").attr("text-anchor", "middle").attr("dy", "-0.2em")
-        .attr("font-size", "20px").attr("font-weight", "700")
-        .attr("font-family", "Syne, sans-serif").attr("fill", "#0f172a")
-        .text(totalVolume >= 1000000 ? `${(totalVolume/1000000).toFixed(2)}M` : totalVolume.toLocaleString());
+    // Center Summary Typography Label
+    chartG.append("text")
+          .attr("text-anchor", "middle")
+          .attr("dy", "-0.15em")
+          .attr("font-size", "22px")
+          .attr("font-weight", "700")
+          .attr("font-family", "Syne, sans-serif")
+          .attr("fill", "#0f172a")
+          .text(totalVolume >= 1e6 ? `${(totalVolume / 1e6).toFixed(2)}M` : totalVolume.toLocaleString());
         
-    chartG.append("text").attr("text-anchor", "middle").attr("dy", "1.3em")
-        .attr("font-size", "10px").attr("font-weight", "500")
-        .attr("font-family", "DM Sans, sans-serif").attr("fill", "#94a3b8")
-        .text("Modern Incidents");
+    chartG.append("text")
+          .attr("text-anchor", "middle")
+          .attr("dy", "1.25em")
+          .attr("font-size", "11px")
+          .attr("font-weight", "500")
+          .attr("font-family", "DM Sans, sans-serif")
+          .attr("fill", "#64748b")
+          .text("Positive Cases");
 
+    // 6. Dynamic Legend Layout Calculations
     const legendG = svg.append("g").attr("class", "donut-legend");
-    let currentX = 0, currentY = 0;
-    const spacingX = 130, spacingY = 18;
+    let lineX = 0, lineY = 0;
+    const strideX = 145, strideY = 20;
 
-    totals.forEach((d, i) => {
-        const itemG = legendG.append("g").attr("transform", `translate(${currentX}, ${currentY})`);
-        itemG.append("rect").attr("width", 10).attr("height", 10).attr("rx", 2).attr("fill", regionalColors[d.region]);
-        itemG.append("text").attr("x", 15).attr("y", 9).attr("font-size", "11px")
-             .attr("fill", "#475569").attr("font-family", "DM Sans, sans-serif").text(d.region);
+    totals.forEach((item, index) => {
+        const entryG = legendG.append("g").attr("transform", `translate(${lineX}, ${lineY})`);
+        
+        entryG.append("rect")
+              .attr("width", 11)
+              .attr("height", 11)
+              .attr("rx", 2)
+              .attr("fill", getHexColor(item.region));
 
-        if (i % 2 === 0) { currentX += spacingX; } 
-        else { currentX = 0; currentY += spacingY; }
+        entryG.append("text")
+              .attr("x", 16)
+              .attr("y", 10)
+              .attr("font-size", "11px")
+              .attr("fill", "#334155")
+              .attr("font-family", "DM Sans, sans-serif")
+              .text(`${item.region} (${((item.value / totalVolume) * 100).toFixed(0)}%)`);
+
+        if ((index + 1) % 2 === 0) {
+            lineX = 0;
+            lineY += strideY;
+        } else {
+            lineX += strideX;
+        }
     });
 
-    const bounds = legendG.node().getBBox();
-    legendG.attr("transform", `translate(${(width - bounds.width) / 2}, ${(radius * 2) + margin.top + 20})`);
-}
-
-// Function to render the Demographics Bar Chart
-function renderBreathBarChart(data) {
-    const container = d3.select("#breath-bar-chart");
-    container.selectAll("*").remove();
-
-    if (!data || data.length === 0) {
-        console.warn("Bar chart received an empty data array.");
-        return;
-    }
-
-    const margin = { top: 30, right: 30, bottom: 65, left: 75 };
-    const width = container.node().getBoundingClientRect().width - margin.left - margin.right || 450;
-    const height = 320 - margin.top - margin.bottom;
-
-    const svg = container.append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-    const csvKeys = Object.keys(data[0]);
-    const groupField = csvKeys.find(k => k.toLowerCase().includes('age') || k.toLowerCase().includes('category') || k.toLowerCase().includes('demographic')) || csvKeys[0];
-    const valueField = csvKeys.find(k => k.toLowerCase().includes('positive') || k.toLowerCase().includes('count') || k.toLowerCase().includes('value')) || "COUNT";
-
-    let rolledData = d3.rollups(
-        data,
-        v => d3.sum(v, d => +d[valueField] || 0),
-        d => d[groupField]
-    ).map(([key, value]) => ({ key: key || "Unknown", value }))
-     .filter(d => d.key !== "Unknown" && d.key !== "undefined" && d.value > 0);
-
-    if (rolledData.length === 0) {
-        svg.append("text")
-            .attr("x", width / 2)
-            .attr("y", height / 2)
-            .attr("text-anchor", "middle")
-            .style("font-family", "DM Sans, sans-serif")
-            .style("fill", "#64748b")
-            .text("No matching demographic values found.");
-        return;
-    }
-
-    rolledData.sort((a, b) => b.value - a.value);
-
-    const x = d3.scaleBand().domain(rolledData.map(d => d.key)).range([0, width]).padding(0.3);
-    const y = d3.scaleLinear().domain([0, d3.max(rolledData, d => d.value) * 1.1]).range([height, 0]);
-
-    const barColor = "#ea580c"; 
-    const hoverColor = "#b45309";
-
-    svg.append("g")
-        .attr("transform", `translate(0, ${height})`)
-        .call(d3.axisBottom(x))
-        .selectAll("text")
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .attr("transform", "rotate(-25)") 
-        .style("font-family", "'DM Sans', sans-serif")
-        .style("font-size", "11px")
-        .style("fill", "#64748b");
-
-    svg.append("g")
-        .call(d3.axisLeft(y).ticks(5).tickFormat(d => {
-            if (d >= 1000000) return `${(d/1000000).toFixed(1)}M`;
-            if (d >= 1000) return `${(d/1000).toFixed(0)}K`;
-            return d;
-        }))
-        .style("font-family", "'DM Sans', sans-serif")
-        .style("font-size", "11px")
-        .style("fill", "#64748b");
-
-    svg.selectAll(".bar")
-        .data(rolledData)
-        .enter()
-        .append("rect")
-        .attr("class", "bar")
-        .attr("x", d => x(d.key))
-        .attr("width", x.bandwidth())
-        .attr("y", height)
-        .attr("height", 0)
-        .attr("fill", barColor)
-        .attr("rx", 4)
-        .on("mouseover", function(event, d) {
-            d3.select(this).attr("fill", hoverColor);
-            breathTooltip.style("opacity", 1)
-                .html(`<strong>${d.key}</strong><br>Incidents: ${d.value.toLocaleString()}`);
-        })
-        .on("mousemove", function(event) {
-            breathTooltip.style("left", (event.pageX + 14) + "px")
-                         .style("top", (event.pageY - 32) + "px");
-        })
-        .on("mouseout", function() {
-            d3.select(this).attr("fill", barColor);
-            breathTooltip.style("opacity", 0);
-        })
-        .transition()
-        .duration(800)
-        .attr("y", d => y(d.value))
-        .attr("height", d => height - y(d.value));
+    // Auto-center legend positioning beneath chart base boundary box
+    const bbox = legendG.node().getBBox();
+    legendG.attr("transform", `translate(${(width - bbox.width) / 2}, ${(radius * 2) + margin.top + 24})`);
 }

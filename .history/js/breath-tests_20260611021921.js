@@ -56,6 +56,14 @@ Promise.all([
     stateFilter.selectAll("option:not([value='all'])").remove();
     states.forEach(s => stateFilter.append("option").attr("value", s).text(s));
     
+    // FIXED: Extracted unique years from the valid modern array instead of undefined "data"
+    const uniqueYears = [...new Set(modern.map(d => d.YEAR))].filter(y => y).sort((a, b) => b - a);
+
+    const donutYearSelect = d3.select("#donut-year-filter");
+    donutYearSelect.selectAll("*").remove(); // Prevent duplicates
+    donutYearSelect.append("option").attr("value", "all").text("All Years");
+    uniqueYears.forEach(y => donutYearSelect.append("option").attr("value", y).text(y));
+
     const barYearSelect = d3.select("#bar-year-filter");
     barYearSelect.selectAll("*").remove(); // Prevent duplicates
     barYearSelect.append("option").attr("value", "all").text("All Years");
