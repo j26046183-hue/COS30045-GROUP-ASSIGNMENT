@@ -1,7 +1,7 @@
 /**
  * breath-test.js
  * Core interactive visualization engine for Breath Test Enforcement metrics.
- * Tailored explicitly to 2-file structure using real data metrics schema.
+ * Architecture: Line Chart (Timeline), Doughnut Chart (Geography), Radar Chart (Demographics).
  */
 
 const breathTooltip = d3.select("body").append("div").attr("class", "tooltip");
@@ -38,19 +38,19 @@ Promise.all([
         return;
     }
 
-    // Clean data parsing routines for historical file
+    // Clean data parsing routines
     historical.forEach(d => { 
         d.YEAR = +d.YEAR; 
         d.COUNT = +d.COUNT; 
     });
 
-    // Clean data parsing routines for modern file (matches your exact CSV keys)
     modern.forEach(d => {
         d.YEAR = +d.YEAR;
         d.COUNT = +d.COUNT;
-        d["TOTAL FINES"] = +d["TOTAL FINES"] || 0;
-        d["TOTAL CHARGES"] = +d["TOTAL CHARGES"] || 0;
-        d["TOTAL ARRESTS"] = +d["TOTAL ARRESTS"] || 0;
+        // Parse outcome counts if they exist in your file
+        if (d.FINES) d.FINES = +d.FINES;
+        if (d.ARRESTS) d.ARRESTS = +d.ARRESTS;
+        if (d.CHARGES) d.CHARGES = +d.CHARGES;
     });
 
     breathHistoricalData = historical;
@@ -80,28 +80,20 @@ function applyBreathFilters() {
         filteredHistorical = filteredHistorical.filter(d => d.STATE === selectedState);
     }
 
-    // ── 2. FILTER MODERN GRANULAR STREAM ──
+    // ── 2. FILTER MODERN GRANULAR STREAM (USED FOR REGION & RADAR DEMOGRAPHICS) ──
     let filteredModern = breathModernData.slice();
     if (selectedState !== "all") {
         filteredModern = filteredModern.filter(d => d.STATE === selectedState);
     }
 
-    // Helper to sanitize incoming LOCATION column entries down to standard names
-    const normalizeRegion = (locString) => {
-        if (!locString) return "Unknown";
-        return locString.replace(" of Australia", "").replace(" Australia", "").trim();
-    };
-
     // ── 3. CALCULATE LIVE KPI INSIGHTS ──
     const totalHistoricalTests = d3.sum(filteredHistorical, d => d.COUNT);
-    const totalFines = d3.sum(filteredModern, d => d["TOTAL FINES"]);
-    const totalCharges = d3.sum(filteredModern, d => d["TOTAL CHARGES"]);
+    const totalFines = d3.sum(filteredModern, d => d.FINES || 0);
+    const totalCharges = d3.sum(filteredModern, d => d.CHARGES || 0);
 
-    // Aggregate values to find top geographical zone dynamically
-    const regionMap = d3.rollup(filteredModern, 
-        v => d3.sum(v, d => d.COUNT), 
-        d => normalizeRegion(d.LOCATION)
-    );
+    // Dynamic search for top risk geography zone 
+    // * Note: Change 'REGION' to match your column name if different (e.g. 'REMOTENESS')
+    const regionMap = d3.rollup(filteredModern, v => d3.sum(v, d => d.COUNT), d => d.REGION);
     const topRegionObj = Array.from(regionMap, ([region, val]) => ({ region, val }))
                               .sort((a, b) => b.val - a.val)[0];
 
@@ -117,7 +109,7 @@ function applyBreathFilters() {
     drawBreathDemographicRadar(filteredModern);
 }
 
-// ── CHART 1: Historical Trend (Line Chart) ──
+// ── CHART 1: Historical Trend (Classic Continuous Line Chart) ──
 function drawBreathHistorical(data) {
     d3.select("#breath-historical-chart").selectAll("*").remove();
     if (data.length === 0) return;
@@ -210,20 +202,12 @@ function drawBreathRegionalDonut(data) {
     const svg = d3.select("#breath-donut-chart").append("svg").attr("width", width).attr("height", height);
     const chartG = svg.append("g").attr("transform", `translate(${width / 2}, ${radius + margin.top})`);
 
+    // Grouping structure match
     const regions = ["Major Cities", "Inner Regional", "Outer Regional", "Remote", "Very Remote"];
-    
-    // Parse location strings from your explicit layout pattern
-    const totals = regions.map(region => {
-        const matchingRows = data.filter(d => {
-            if (!d.LOCATION) return false;
-            const normalized = d.LOCATION.replace(" of Australia", "").replace(" Australia", "").trim();
-            return normalized.toLowerCase() === region.toLowerCase();
-        });
-        return {
-            region,
-            value: d3.sum(matchingRows, d => d.COUNT)
-        };
-    });
+    const totals = regions.map(region => ({
+        region,
+        value: d3.sum(data, d => d.REGION === region ? d.COUNT : 0) // Change 'REGION' if column has a different name
+    }));
 
     const totalVolume = d3.sum(totals, d => d.value);
 
@@ -302,8 +286,9 @@ function drawBreathDemographicRadar(data) {
 
     const ageBuckets = ["0-16", "17-25", "26-39", "40-64", "65 and over"];
     
-    // Map data values out cleanly matching 'AGE_GROUP' fields
-    const demoMap = d3.rollup(data, v => d3.sum(v, d => d.COUNT), d => d.AGE_GROUP ? d.AGE_GROUP.trim() : "Unknown");
+    // Aggregate values
+    // * Note: Change 'AGE_GROUP' if your file uses a different column name (like 'AGE')
+    const demoMap = d3.rollup(data, v => d3.sum(v, d => d.COUNT), d => d.AGE_GROUP);
     const maxVal = d3.max(ageBuckets, age => demoMap.get(age) || 0) || 100;
 
     const rScale = d3.scaleLinear().domain([0, maxVal]).range([0, radius]);

@@ -1,7 +1,7 @@
 /**
  * breath-test.js
- * Core interactive visualization engine for Breath Test Enforcement metrics.
- * Tailored explicitly to 2-file structure using real data metrics schema.
+ * * Core interactive visualization engine for Breath Test Enforcement metrics.
+ * Layout Focus: Line Chart (Timeline), Doughnut Chart (Geography), Radar Chart (Demographics).
  */
 
 const breathTooltip = d3.select("body").append("div").attr("class", "tooltip");
@@ -24,48 +24,46 @@ const regionalColors = {
 
 // Global raw data storage vectors
 let breathHistoricalData = [];
-let breathModernData = [];
+let breathRegionalData = [];
+let breathDemographicData = [];
 
-// Load your TWO CSV data files via Promise engine
+// Load all Breath Test CSVs via clean Promise engine
 Promise.all([
-    d3.csv("data/breath_historical_trend.csv").catch(err => { console.error("Missing: breath_historical_trend.csv", err); return null; }),
-    d3.csv("data/breath_2023_2024.csv").catch(err => { console.error("Missing: breath_2023_2024.csv", err); return null; })
-]).then(function([historical, modern]) {
+    d3.csv("data/breath_historical_trend.csv"),
+    d3.csv("data/breath_2023_2024.csv")
+]).then(function([historical, byRegion, byDemo]) {
 
-    // Safety Check: Verify files loaded successfully
-    if (!historical || !modern) {
-        console.error("Critical Stop: One or both files failed to load. Check file paths or extensions.");
-        return;
-    }
-
-    // Clean data parsing routines for historical file
+    // Clean data parsing routines
     historical.forEach(d => { 
         d.YEAR = +d.YEAR; 
         d.COUNT = +d.COUNT; 
     });
 
-    // Clean data parsing routines for modern file (matches your exact CSV keys)
-    modern.forEach(d => {
-        d.YEAR = +d.YEAR;
+    byRegion.forEach(d => {
         d.COUNT = +d.COUNT;
-        d["TOTAL FINES"] = +d["TOTAL FINES"] || 0;
-        d["TOTAL CHARGES"] = +d["TOTAL CHARGES"] || 0;
-        d["TOTAL ARRESTS"] = +d["TOTAL ARRESTS"] || 0;
+        d.FINES = +d.FINES;
+        d.ARRESTS = +d.ARRESTS;
+        d.CHARGES = +d.CHARGES;
+    });
+
+    byDemo.forEach(d => {
+        d.COUNT = +d.COUNT;
     });
 
     breathHistoricalData = historical;
-    breathModernData = modern;
+    breathRegionalData = byRegion;
+    breathDemographicData = byDemo;
 
-    // Dynamically build State dropdown list from historical records
+    // Dynamically build State dropdown list from files
     const states = [...new Set(historical.map(d => d.STATE))].sort();
     const stateFilter = d3.select("#breath-state-filter");
     stateFilter.selectAll("option:not([value='all'])").remove();
     states.forEach(s => stateFilter.append("option").attr("value", s).text(s));
 
-    // Hook filter change event listener
+    // Single click/change hook on State dropdown selector
     d3.select("#breath-state-filter").on("change", applyBreathFilters);
 
-    // Initial render execution
+    // Initial load view setup
     applyBreathFilters();
 }).catch(err => {
     console.error("Error executing breath-test data compilation routines:", err);
@@ -74,50 +72,48 @@ Promise.all([
 function applyBreathFilters() {
     const selectedState = d3.select("#breath-state-filter").property("value") || "all";
 
-    // ── 1. FILTER HISTORICAL TIMELINE STREAM ──
+    // ── 1. FILTER HISTORICAL ARRAY ──
     let filteredHistorical = breathHistoricalData.slice();
     if (selectedState !== "all") {
         filteredHistorical = filteredHistorical.filter(d => d.STATE === selectedState);
     }
 
-    // ── 2. FILTER MODERN GRANULAR STREAM ──
-    let filteredModern = breathModernData.slice();
+    // ── 2. FILTER REGIONAL GEOGRAPHY ARRAY ──
+    let filteredRegion = breathRegionalData.slice();
     if (selectedState !== "all") {
-        filteredModern = filteredModern.filter(d => d.STATE === selectedState);
+        filteredRegion = filteredRegion.filter(d => d.STATE === selectedState);
     }
 
-    // Helper to sanitize incoming LOCATION column entries down to standard names
-    const normalizeRegion = (locString) => {
-        if (!locString) return "Unknown";
-        return locString.replace(" of Australia", "").replace(" Australia", "").trim();
-    };
+    // ── 3. FILTER AGE DEMOGRAPHICS ARRAY ──
+    let filteredDemo = breathDemographicData.slice();
+    if (selectedState !== "all") {
+        filteredDemo = filteredDemo.filter(d => d.STATE === selectedState);
+    }
 
-    // ── 3. CALCULATE LIVE KPI INSIGHTS ──
+    // ── 4. CALCULATE DYNAMIC SUMMARY KPI STATS ──
     const totalHistoricalTests = d3.sum(filteredHistorical, d => d.COUNT);
-    const totalFines = d3.sum(filteredModern, d => d["TOTAL FINES"]);
-    const totalCharges = d3.sum(filteredModern, d => d["TOTAL CHARGES"]);
+    const totalCharges = d3.sum(filteredRegion, d => d.CHARGES);
+    const totalFines = d3.sum(filteredRegion, d => d.FINES);
+    const totalArrests = d3.sum(filteredRegion, d => d.ARRESTS);
 
-    // Aggregate values to find top geographical zone dynamically
-    const regionMap = d3.rollup(filteredModern, 
-        v => d3.sum(v, d => d.COUNT), 
-        d => normalizeRegion(d.LOCATION)
-    );
+    // Find primary geographical risk location
+    const regionMap = d3.rollup(filteredRegion, v => d3.sum(v, d => d.COUNT), d => d.REGION);
     const topRegionObj = Array.from(regionMap, ([region, val]) => ({ region, val }))
                               .sort((a, b) => b.val - a.val)[0];
 
-    // Update HTML layout containers dynamically
+    // Update Dashboard metric values dynamically
     d3.select("#breath-total-historical").text(totalHistoricalTests.toLocaleString());
     d3.select("#breath-modern-fines").text(totalFines.toLocaleString());
     d3.select("#breath-modern-charges").text(totalCharges.toLocaleString());
     d3.select("#breath-top-region").text(topRegionObj && topRegionObj.val > 0 ? topRegionObj.region : "—");
 
-    // ── 4. RE-RENDER ALL VISUALS CLEANLY ──
+    // ── 5. REDRAW VISUALS CLEANLY ──
     drawBreathHistorical(filteredHistorical);
-    drawBreathRegionalDonut(filteredModern);
-    drawBreathDemographicRadar(filteredModern);
+    drawBreathRegionalDonut(filteredRegion);
+    drawBreathDemographicRadar(filteredDemo);
 }
 
-// ── CHART 1: Historical Trend (Line Chart) ──
+// ── CHART 1: Historical Trend (Classic Continuous Line Chart) ──
 function drawBreathHistorical(data) {
     d3.select("#breath-historical-chart").selectAll("*").remove();
     if (data.length === 0) return;
@@ -139,6 +135,7 @@ function drawBreathHistorical(data) {
     const x = d3.scaleLinear().domain(d3.extent(data, d => d.YEAR)).range([0, width]);
     const y = d3.scaleLinear().domain([0, d3.max(data, d => d.COUNT) * 1.1 || 100]).range([height, 0]);
 
+    // Background dashed grid architecture
     svg.append("g").attr("class", "grid")
         .call(d3.axisLeft(y).ticks(5).tickSize(-width).tickFormat(""))
         .selectAll("line").style("stroke", "#f1f5f9").style("stroke-dasharray", "4,4");
@@ -167,10 +164,12 @@ function drawBreathHistorical(data) {
         const sorted = values.sort((a, b) => a.YEAR - b.YEAR);
         const color = breathStateColors[state] || "#94a3b8";
 
+        // Draw Line Path
         svg.append("path").datum(sorted)
             .attr("fill", "none").attr("stroke", color)
             .attr("stroke-width", 2.5).attr("d", line);
 
+        // Track data nodes with circular markers
         svg.selectAll(`.dot-${state}`)
             .data(sorted).enter().append("circle")
             .attr("cx", d => x(d.YEAR)).attr("cy", d => y(d.COUNT))
@@ -185,6 +184,7 @@ function drawBreathHistorical(data) {
             .on("mouseout", function() { breathTooltip.style("opacity", 0); });
     });
 
+    // Render Right Panel Legend
     const legend = svg.append("g").attr("transform", `translate(${width + 12}, 0)`);
     ([...grouped.keys()]).sort().forEach((state, i) => {
         const row = legend.append("g").attr("transform", `translate(0, ${i * 18})`);
@@ -195,7 +195,7 @@ function drawBreathHistorical(data) {
     });
 }
 
-// ── CHART 2: Spatial Regional Distribution (Doughnut Wheel) ──
+// ── CHART 2: Spatial Regional Distribution (Perfectly Balanced Doughnut Wheel) ──
 function drawBreathRegionalDonut(data) {
     d3.select("#breath-donut-chart").selectAll("*").remove();
 
@@ -207,23 +207,20 @@ function drawBreathRegionalDonut(data) {
     const margin = { top: 20, right: 20, bottom: 65, left: 20 };
     const radius = Math.min(width - margin.left - margin.right, height - margin.top - margin.bottom) / 2;
 
-    const svg = d3.select("#breath-donut-chart").append("svg").attr("width", width).attr("height", height);
-    const chartG = svg.append("g").attr("transform", `translate(${width / 2}, ${radius + margin.top})`);
+    const svg = d3.select("#breath-donut-chart")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
+    const chartG = svg.append("g")
+        .attr("transform", `translate(${width / 2}, ${radius + margin.top})`);
+
+    // Dynamic aggregation across standard remoteness groupings
     const regions = ["Major Cities", "Inner Regional", "Outer Regional", "Remote", "Very Remote"];
-    
-    // Parse location strings from your explicit layout pattern
-    const totals = regions.map(region => {
-        const matchingRows = data.filter(d => {
-            if (!d.LOCATION) return false;
-            const normalized = d.LOCATION.replace(" of Australia", "").replace(" Australia", "").trim();
-            return normalized.toLowerCase() === region.toLowerCase();
-        });
-        return {
-            region,
-            value: d3.sum(matchingRows, d => d.COUNT)
-        };
-    });
+    const totals = regions.map(region => ({
+        region,
+        value: d3.sum(data, d => d.REGION === region ? d.COUNT : 0)
+    }));
 
     const totalVolume = d3.sum(totals, d => d.value);
 
@@ -240,7 +237,8 @@ function drawBreathRegionalDonut(data) {
 
     chartG.selectAll(".arc")
         .data(pie(totals.filter(d => d.value > 0))).enter().append("path")
-        .attr("class", "arc").attr("d", arc)
+        .attr("class", "arc")
+        .attr("d", arc)
         .attr("fill", d => regionalColors[d.data.region] || "#cbd5e1")
         .attr("stroke", "white").attr("stroke-width", 2.5)
         .on("mouseover", function(event, d) {
@@ -257,6 +255,7 @@ function drawBreathRegionalDonut(data) {
             breathTooltip.style("opacity", 0);
         });
 
+    // Central Donut Metric Labels
     chartG.append("text").attr("text-anchor", "middle").attr("dy", "-0.2em")
         .attr("font-size", "20px").attr("font-weight", "700")
         .attr("font-family", "Syne, sans-serif").attr("fill", "#0f172a")
@@ -267,6 +266,7 @@ function drawBreathRegionalDonut(data) {
         .attr("font-family", "DM Sans, sans-serif").attr("fill", "#94a3b8")
         .text("Modern Incidents");
 
+    // Balanced Horizontal Multi-Column Legend
     const legendG = svg.append("g").attr("class", "donut-legend");
     let currentX = 0, currentY = 0;
     const spacingX = 130, spacingY = 18;
@@ -285,7 +285,7 @@ function drawBreathRegionalDonut(data) {
     legendG.attr("transform", `translate(${(width - bounds.width) / 2}, ${(radius * 2) + margin.top + 20})`);
 }
 
-// ── CHART 3: Cohort Demographics Profiling (Radar Web Chart) ──
+// ── CHART 3: Cohort Demographics Profiling (Interactive Radar Web Chart) ──
 function drawBreathDemographicRadar(data) {
     d3.select("#breath-radar-chart").selectAll("*").remove();
 
@@ -295,21 +295,27 @@ function drawBreathDemographicRadar(data) {
     const width = container.offsetWidth;
     const height = 320;
     const margin = { top: 40, right: 50, bottom: 40, left: 50 };
+    
     const radius = Math.min(width - margin.left - margin.right, height - margin.top - margin.bottom) / 2;
 
-    const svg = d3.select("#breath-radar-chart").append("svg").attr("width", width).attr("height", height)
-                  .append("g").attr("transform", `translate(${width / 2}, ${height / 2})`);
+    const svg = d3.select("#breath-radar-chart")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
+    // Standard structural age classifications order mapping
     const ageBuckets = ["0-16", "17-25", "26-39", "40-64", "65 and over"];
     
-    // Map data values out cleanly matching 'AGE_GROUP' fields
-    const demoMap = d3.rollup(data, v => d3.sum(v, d => d.COUNT), d => d.AGE_GROUP ? d.AGE_GROUP.trim() : "Unknown");
+    // Roll up values matching targets keys
+    const demoMap = d3.rollup(data, v => d3.sum(v, d => d.COUNT), d => d.AGE_GROUP);
     const maxVal = d3.max(ageBuckets, age => demoMap.get(age) || 0) || 100;
 
     const rScale = d3.scaleLinear().domain([0, maxVal]).range([0, radius]);
     const angleSlice = (Math.PI * 2) / ageBuckets.length;
 
-    // Web Grid Levels
+    // ── Render Concentric Structural Background Web Rings ──
     const levels = 4;
     for (let level = 0; level < levels; level++) {
         const r = radius * ((level + 1) / levels);
@@ -318,33 +324,51 @@ function drawBreathDemographicRadar(data) {
             y: -r * Math.cos(angleSlice * i)
         }));
 
-        svg.append("polygon").datum(gridPoints).attr("points", d => d.map(p => `${p.x},${p.y}`).join(" "))
-           .attr("fill", "none").attr("stroke", "#f1f5f9").attr("stroke-width", 1);
+        svg.append("polygon")
+            .datum(gridPoints)
+            .attr("points", d => d.map(p => `${p.x},${p.y}`).join(" "))
+            .attr("fill", "none")
+            .attr("stroke", "#f1f5f9")
+            .attr("stroke-width", 1);
             
-        svg.append("text").attr("x", 4).attr("y", -r + 3).attr("font-size", "9px")
-           .attr("fill", "#cbd5e1").attr("font-family", "DM Sans, sans-serif")
-           .text(Math.round(maxVal * ((level + 1) / levels)).toLocaleString());
+        // Text scale annotations along vertical axis
+        svg.append("text")
+            .attr("x", 4)
+            .attr("y", -r + 3)
+            .attr("font-size", "9px")
+            .attr("fill", "#cbd5e1")
+            .attr("font-family", "DM Sans, sans-serif")
+            .text(Math.round(maxVal * ((level + 1) / levels)).toLocaleString());
     }
 
-    // Spokes & Axes
-    const axisG = svg.selectAll(".axis-spoke").data(ageBuckets).enter().append("g").attr("class", "axis-spoke");
-    axisG.append("line").attr("x1", 0).attr("y1", 0)
-         .attr("x2", (d, i) => radius * Math.sin(angleSlice * i))
-         .attr("y2", (d, i) => -radius * Math.cos(angleSlice * i))
-         .attr("stroke", "#e2e8f0").attr("stroke-width", 1);
+    // ── Render Axis Spoke Lines & Captions ──
+    const axisG = svg.selectAll(".axis-spoke")
+        .data(ageBuckets).enter().append("g").attr("class", "axis-spoke");
 
-    axisG.append("text").attr("class", "radar-label")
-         .attr("x", (d, i) => (radius + 12) * Math.sin(angleSlice * i))
-         .attr("y", (d, i) => -(radius + 12) * Math.cos(angleSlice * i) + 4)
-         .attr("text-anchor", (d, i) => {
-             const angle = angleSlice * i;
-             if (angle === 0 || angle === Math.PI) return "middle";
-             return angle < Math.PI ? "start" : "end";
-         })
-         .attr("font-size", "11px").attr("font-weight", "500").attr("fill", "#475569")
-         .attr("font-family", "DM Sans, sans-serif").text(d => d);
+    axisG.append("line")
+        .attr("x1", 0).attr("y1", 0)
+        .attr("x2", (d, i) => radius * Math.sin(angleSlice * i))
+        .attr("y2", (d, i) => -radius * Math.cos(angleSlice * i))
+        .attr("stroke", "#e2e8f0")
+        .attr("stroke-width", 1);
 
-    // Active Data Shape Drawing
+    // Dynamic placement adjustments for outward labels text alignment
+    axisG.append("text")
+        .attr("class", "radar-label")
+        .attr("x", (d, i) => (radius + 12) * Math.sin(angleSlice * i))
+        .attr("y", (d, i) => -(radius + 12) * Math.cos(angleSlice * i) + 4)
+        .attr("text-anchor", (d, i) => {
+            const angle = angleSlice * i;
+            if (angle === 0 || angle === Math.PI) return "middle";
+            return angle < Math.PI ? "start" : "end";
+        })
+        .attr("font-size", "11px")
+        .attr("font-weight", "500")
+        .attr("fill", "#475569")
+        .attr("font-family", "DM Sans, sans-serif")
+        .text(d => d);
+
+    // ── Generate & Render the Active Risk Data Shape ──
     const radarPoints = ageBuckets.map((age, i) => {
         const val = demoMap.get(age) || 0;
         return {
@@ -358,21 +382,35 @@ function drawBreathDemographicRadar(data) {
     const stateFilterValue = d3.select("#breath-state-filter").property("value") || "all";
     const shapeColor = breathStateColors[stateFilterValue] || "#4f46e5";
 
-    svg.append("polygon").datum(radarPoints).attr("points", d => d.map(p => `${p.x},${p.y}`).join(" "))
-       .attr("fill", shapeColor).attr("fill-opacity", 0.2).attr("stroke", shapeColor).attr("stroke-width", 2.5);
+    // Polygon path
+    svg.append("polygon")
+        .datum(radarPoints)
+        .attr("points", d => d.map(p => `${p.x},${p.y}`).join(" "))
+        .attr("fill", shapeColor)
+        .attr("fill-opacity", 0.2)
+        .attr("stroke", shapeColor)
+        .attr("stroke-width", 2.5);
 
-    svg.selectAll(".radar-dot").data(radarPoints).enter().append("circle").attr("class", "radar-dot")
-       .attr("cx", d => d.x).attr("cy", d => d.y).attr("r", 4).attr("fill", shapeColor)
-       .attr("stroke", "white").attr("stroke-width", 1.5)
-       .on("mouseover", function(event, d) {
-           d3.select(this).attr("r", 6);
-           breathTooltip.style("opacity", 1).html(`<strong>Age Group: ${d.age}</strong><br>Tests: ${d.value.toLocaleString()}`);
-       })
-       .on("mousemove", function(event) {
-           breathTooltip.style("left", (event.pageX + 14) + "px").style("top", (event.pageY - 32) + "px");
-       })
-       .on("mouseout", function() {
-           d3.select(this).attr("r", 4);
-           breathTooltip.style("opacity", 0);
-       });
+    // Interactive data dot handles over outer vertex junctions
+    svg.selectAll(".radar-dot")
+        .data(radarPoints).enter().append("circle")
+        .attr("class", "radar-dot")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r", 4)
+        .attr("fill", shapeColor)
+        .attr("stroke", "white")
+        .attr("stroke-width", 1.5)
+        .on("mouseover", function(event, d) {
+            d3.select(this).attr("r", 6);
+            breathTooltip.style("opacity", 1)
+                .html(`<strong>Cohort Age: ${d.age}</strong><br>Tests: ${d.value.toLocaleString()}`);
+        })
+        .on("mousemove", function(event) {
+            breathTooltip.style("left", (event.pageX + 14) + "px").style("top", (event.pageY - 32) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select(this).attr("r", 4);
+            breathTooltip.style("opacity", 0);
+        });
 }

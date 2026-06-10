@@ -242,6 +242,7 @@
             <p>Data sourced from the Bureau of Infrastructure and Transport Research Economics (BITRE), 2024.</p>
             <p>COS30045 Data Visualization | Group 10 | Kartikyogam | Kugendran</p>
         </div>
+
     </div>
 
     <div id="page-fines" class="page">
@@ -306,6 +307,7 @@
             <div class="chart-card-title">Fines by Location Type</div>
             <div id="fines-location-chart"></div>
         </div>
+
     </div>
 
     <div id="page-drugs" class="page">
@@ -345,42 +347,43 @@
             <div id="drug-historical-chart"></div>
         </div>
 
-        <div class="charts-grid-2">
-            <div class="chart-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <div class="chart-card-title" style="margin: 0;">Drug Type Breakdown (2023–2024)</div>
-                    <div style="display: flex; align-items: center;">
-                        <label style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: #64748b; margin-right: 6px;">Year:</label>
-                        <select id="donut-year-filter" style="padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 11px; color: #475569; background-color: #fff; cursor: pointer; outline: none;">
-                            <option value="all">2023-2024 (Total)</option>
-                            <option value="2023">2023</option>
-                            <option value="2024">2024</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="drug-donut-chart"></div>
-            </div>
-
-            <div class="chart-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <div class="chart-card-title" style="margin: 0;">Positive Tests by State (2023–2024)</div>
-                    <div style="display: flex; align-items: center;">
-                        <label style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: #64748b; margin-right: 6px;">Year:</label>
-                        <select id="lollipop-year-filter" style="padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 11px; color: #475569; background-color: #fff; cursor: pointer; outline: none;">
-                            <option value="all">2023-2024 (Total)</option>
-                            <option value="2023">2023</option>
-                            <option value="2024">2024</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="drug-bar-chart"></div>
+       <div class="charts-grid-2">
+    <div class="chart-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div class="chart-card-title" style="margin: 0;">Drug Type Breakdown (2023–2024)</div>
+            <div style="display: flex; align-items: center;">
+                <label style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: #64748b; margin-right: 6px;">Year:</label>
+                <select id="donut-year-filter" style="padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 11px; color: #475569; background-color: #fff; cursor: pointer; outline: none;">
+                    <option value="all">2023-2024 (Total)</option>
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
+                </select>
             </div>
         </div>
+        <div id="drug-donut-chart"></div>
+    </div>
+
+    <div class="chart-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div class="chart-card-title" style="margin: 0;">Positive Tests by State (2023–2024)</div>
+            <div style="display: flex; align-items: center;">
+                <label style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: #64748b; margin-right: 6px;">Year:</label>
+                <select id="lollipop-year-filter" style="padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 11px; color: #475569; background-color: #fff; cursor: pointer; outline: none;">
+                    <option value="all">2023-2024 (Total)</option>
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+        </div>
+        <div id="drug-bar-chart"></div>
+    </div>
+</div>
 
         <div class="chart-card full-width">
             <div class="chart-card-title">Enforcement Actions by State — Fines, Arrests & Charges</div>
             <div id="drug-actions-chart"></div>
         </div>
+
     </div>
 
     <div id="page-breath" class="page">
@@ -395,7 +398,6 @@
                 <select id="breath-state-filter"><option value="all">All States</option></select>
             </div>
         </div>
-
         <div class="mini-stats">
             <div class="mini-stat">
                 <div class="mini-stat-label">Total Positive Tests</div>
@@ -422,14 +424,15 @@
 
         <div class="charts-grid-2">
             <div class="chart-card">
-                <div class="chart-card-title">Spatial Regional Distribution (2023–2024)</div>
-                <div id="breath-donut-chart"></div>
+                <div class="chart-card-title">Total Positive Tests by State (2023–2024)</div>
+                <div id="breath-bar-chart"></div>
             </div>
             <div class="chart-card">
-                <div class="chart-card-title">Cohort Demographics Profiling (2023–2024)</div>
-                <div id="breath-radar-chart"></div>
+                <div class="chart-card-title">Enforcement Actions by State — Fines, Arrests & Charges</div>
+                <div id="breath-actions-chart"></div>
             </div>
         </div>
+
     </div>
 
     <script src="js/main.js"></script>
