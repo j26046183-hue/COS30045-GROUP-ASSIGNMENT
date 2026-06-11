@@ -3,6 +3,7 @@
 2023,"ACT","Major Cities of Australia","26-39",0,299,32,299
 2023,"ACT","Major Cities of Australia","40-64",0,225,19,225
 2023,"ACT","Major Cities of Australia","65 and over",0,14,0,14
+2023,"ACT","Major Cities of Australia","Unknown",0,1,1,1
 2023,"NSW","Inner Regional Australia","0-16",4,8,0,12
 2023,"NSW","Inner Regional Australia","17-25",388,764,0,1152
 2023,"NSW","Inner Regional Australia","26-39",484,1223,0,1707
@@ -13,6 +14,7 @@
 2023,"NSW","Major Cities of Australia","26-39",706,2057,0,2763
 2023,"NSW","Major Cities of Australia","40-64",848,1937,0,2785
 2023,"NSW","Major Cities of Australia","65 and over",123,161,0,284
+2023,"NSW","Major Cities of Australia","Unknown",1,0,0,1
 2023,"NSW","Outer Regional Australia","0-16",3,0,0,3
 2023,"NSW","Outer Regional Australia","17-25",86,223,0,309
 2023,"NSW","Outer Regional Australia","26-39",112,303,0,415
@@ -22,20 +24,39 @@
 2023,"NSW","Remote Australia","26-39",17,39,0,56
 2023,"NSW","Remote Australia","40-64",10,34,0,44
 2023,"NSW","Remote Australia","65 and over",1,3,0,4
+2023,"NSW","Unknown","0-16",0,1,0,1
+2023,"NSW","Unknown","17-25",16,38,0,54
+2023,"NSW","Unknown","26-39",16,65,0,81
+2023,"NSW","Unknown","40-64",24,61,0,85
+2023,"NSW","Unknown","65 and over",1,6,0,7
 2023,"NSW","Very Remote Australia","17-25",3,3,0,6
 2023,"NSW","Very Remote Australia","26-39",1,15,0,16
 2023,"NSW","Very Remote Australia","40-64",3,15,0,18
 2023,"NSW","Very Remote Australia","65 and over",0,1,0,1
+2023,"NT","Unknown","0-16",0,4,1,0
+2023,"NT","Unknown","17-25",0,270,98,0
+2023,"NT","Unknown","26-39",0,472,195,0
+2023,"NT","Unknown","65 and over",0,409,155,0
+2023,"NT","Unknown","Unknown",0,0,0,7722
+2023,"QLD","Unknown","All ages",0,0,0,15859
+2023,"SA","Unknown","0-16",2,2,3,4
+2023,"SA","Unknown","17-25",275,464,38,739
+2023,"SA","Unknown","26-39",467,1126,107,1593
+2023,"SA","Unknown","40-64",542,1175,99,1717
+2023,"SA","Unknown","65 and over",104,176,4,280
+2023,"SA","Unknown","Unknown",0,0,0,0
 2023,"VIC","Inner Regional Australia","0-16",0,0,0,2
 2023,"VIC","Inner Regional Australia","17-25",0,0,0,379
 2023,"VIC","Inner Regional Australia","26-39",0,0,0,826
 2023,"VIC","Inner Regional Australia","40-64",0,0,0,901
 2023,"VIC","Inner Regional Australia","65 and over",0,0,0,130
+2023,"VIC","Inner Regional Australia","Unknown",0,0,0,1
 2023,"VIC","Major Cities of Australia","0-16",0,0,0,1
 2023,"VIC","Major Cities of Australia","17-25",0,0,0,952
 2023,"VIC","Major Cities of Australia","26-39",0,0,0,2173
 2023,"VIC","Major Cities of Australia","40-64",0,0,0,2068
 2023,"VIC","Major Cities of Australia","65 and over",0,0,0,269
+2023,"VIC","Major Cities of Australia","Unknown",0,0,0,1
 2023,"VIC","Outer Regional Australia","17-25",0,0,0,85
 2023,"VIC","Outer Regional Australia","26-39",0,0,0,199
 2023,"VIC","Outer Regional Australia","40-64",0,0,0,236
@@ -43,6 +64,13 @@
 2023,"VIC","Remote Australia","17-25",0,0,0,1
 2023,"VIC","Remote Australia","26-39",0,0,0,1
 2023,"VIC","Remote Australia","40-64",0,0,0,2
+2023,"VIC","Unknown","40-64",0,0,0,1
+2023,"WA","Unknown","0-16",0,23,2,23
+2023,"WA","Unknown","17-25",424,1566,43,1990
+2023,"WA","Unknown","26-39",813,2470,72,3283
+2023,"WA","Unknown","40-64",767,1893,36,2660
+2023,"WA","Unknown","65 and over",146,196,2,342
+2023,"WA","Unknown","Unknown",0,1,0,1
 2024,"ACT","Major Cities of Australia","17-25",0,165,11,165
 2024,"ACT","Major Cities of Australia","26-39",0,266,27,266
 2024,"ACT","Major Cities of Australia","40-64",0,194,16,194
@@ -67,25 +95,52 @@
 2024,"NSW","Remote Australia","26-39",6,39,0,45
 2024,"NSW","Remote Australia","40-64",10,35,0,45
 2024,"NSW","Remote Australia","65 and over",2,4,0,6
+2024,"NSW","Unknown","17-25",30,73,0,103
+2024,"NSW","Unknown","26-39",38,138,0,176
+2024,"NSW","Unknown","40-64",37,101,0,138
+2024,"NSW","Unknown","65 and over",6,11,0,17
 2024,"NSW","Very Remote Australia","0-16",0,1,0,1
 2024,"NSW","Very Remote Australia","17-25",2,4,0,6
 2024,"NSW","Very Remote Australia","26-39",1,8,0,9
 2024,"NSW","Very Remote Australia","40-64",1,3,0,4
 2024,"NSW","Very Remote Australia","65 and over",0,2,0,2
+2024,"NT","Unknown","0-16",2,11,4,0
+2024,"NT","Unknown","17-25",37,291,89,0
+2024,"NT","Unknown","26-39",92,568,217,0
+2024,"NT","Unknown","40-64",93,460,175,0
+2024,"NT","Unknown","65 and over",7,25,4,0
+2024,"NT","Unknown","Unknown",0,0,0,8717
+2024,"QLD","Unknown","All ages",0,0,0,15336
+2024,"SA","Unknown","0-16",3,2,6,11
+2024,"SA","Unknown","17-25",324,455,46,825
+2024,"SA","Unknown","26-39",401,1114,88,1603
+2024,"SA","Unknown","40-64",488,1119,104,1711
+2024,"SA","Unknown","65 and over",117,161,5,283
+2024,"SA","Unknown","Unknown",0,1,0,1
 2024,"VIC","Inner Regional Australia","0-16",0,0,0,1
 2024,"VIC","Inner Regional Australia","17-25",0,0,0,311
 2024,"VIC","Inner Regional Australia","26-39",0,0,0,547
 2024,"VIC","Inner Regional Australia","40-64",0,0,0,603
 2024,"VIC","Inner Regional Australia","65 and over",0,0,0,74
+2024,"VIC","Inner Regional Australia","Unknown",0,0,0,1
 2024,"VIC","Major Cities of Australia","17-25",0,0,0,755
 2024,"VIC","Major Cities of Australia","26-39",0,0,0,1374
 2024,"VIC","Major Cities of Australia","40-64",0,0,0,1198
 2024,"VIC","Major Cities of Australia","65 and over",0,0,0,146
+2024,"VIC","Major Cities of Australia","Unknown",0,0,0,1
 2024,"VIC","Outer Regional Australia","0-16",0,0,0,1
 2024,"VIC","Outer Regional Australia","17-25",0,0,0,72
 2024,"VIC","Outer Regional Australia","26-39",0,0,0,135
 2024,"VIC","Outer Regional Australia","40-64",0,0,0,152
 2024,"VIC","Outer Regional Australia","65 and over",0,0,0,27
+2024,"VIC","Outer Regional Australia","Unknown",0,0,0,1
 2024,"VIC","Remote Australia","26-39",0,0,0,3
 2024,"VIC","Remote Australia","40-64",0,0,0,2
 2024,"VIC","Remote Australia","65 and over",0,0,0,1
+2024,"VIC","Unknown","26-39",0,0,0,1
+2024,"VIC","Unknown","40-64",0,0,0,1
+2024,"WA","Unknown","0-16",0,25,2,25
+2024,"WA","Unknown","17-25",345,1965,91,2310
+2024,"WA","Unknown","26-39",732,3443,206,4175
+2024,"WA","Unknown","40-64",703,2682,130,3385
+2024,"WA","Unknown","65 and over",140,233,3,373
