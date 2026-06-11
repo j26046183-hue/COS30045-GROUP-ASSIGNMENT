@@ -1,5 +1,4 @@
 // =====================
-// FINES.JS — Always shows 
 // 4 Charts:
 // 1. Historical trend (multi-line)   — fines_historical_trend.csv
 // 2. Fines by state (horizontal bar) — fines_by_state.csv
