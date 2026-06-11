@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Australian Road Safety Enforcement</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav id="navbar">
+        <div class="nav-brand">
+            <span class="brand-dot"></span>
+            Road Safety AU
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="nav-link active" data-page="home">Home</a></li>
+            <li><a href="#" class="nav-link" data-page="fines">Fines</a></li>
+            <li><a href="#" class="nav-link" data-page="drugs">Drug Tests</a></li>
+            <li><a href="#" class="nav-link" data-page="breath">Breath Tests</a></li>
+        </ul>
+    </nav>
+
+    <div id="page-home" class="page active">
+
+        <div class="home-hero">
+            <div class="home-hero-left">
+                <div class="hero-badge">BITRE · 2008–2024 · 8 States & Territories</div>
+                <h1>Australian Road Safety<br><span class="highlight">Enforcement</span> Dashboard</h1>
+                <p>An interactive data visualisation of road safety enforcement across Australia — covering fines, drug testing, breath testing and more. Built using data published by the Bureau of Infrastructure and Transport Research Economics (BITRE).</p>
+
+                <div class="key-facts-grid">
+                    <div class="key-fact">
+                        <span class="key-fact-icon">🏆</span>
+                        <div class="key-fact-content">
+                            <div class="key-fact-label">Highest Fines State</div>
+                            <div class="key-fact-value">VIC — 2,280,698</div>
+                        </div>
+                    </div>
+                    <div class="key-fact">
+                        <span class="key-fact-icon">🚗</span>
+                        <div class="key-fact-content">
+                            <div class="key-fact-label">Most Common Offence</div>
+                            <div class="key-fact-value">Speed Fines</div>
+                        </div>
+                    </div>
+                    <div class="key-fact">
+                        <span class="key-fact-icon">👤</span>
+                        <div class="key-fact-content">
+                            <div class="key-fact-label">Most Fined Age Group</div>
+                            <div class="key-fact-value">40–64 years old</div>
+                        </div>
+                    </div>
+                    <div class="key-fact">
+                        <span class="key-fact-icon">🧪</span>
+                        <div class="key-fact-content">
+                            <div class="key-fact-label">Most Detected Drug</div>
+                            <div class="key-fact-value">Amphetamine</div>
+                        </div>
+                    </div>
+                    <div class="key-fact">
+                        <span class="key-fact-icon">📍</span>
+                        <div class="key-fact-content">
+                            <div class="key-fact-label">Most Fines Location</div>
+                            <div class="key-fact-value">Major Cities</div>
+                        </div>
+                    </div>
+                    <div class="key-fact">
+                        <span class="key-fact-icon">⚖️</span>
+                        <div class="key-fact-content">
+                            <div class="key-fact-label">Total Drug Charges</div>
+                            <div class="key-fact-value">94,202 nationally</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-hero-right">
+                <div class="data-coverage">
+                    <div class="coverage-title">📋 Dataset Coverage</div>
+
+                    <div class="coverage-block">
+                        <div class="coverage-block-title">📅 Years Covered</div>
+                        <div class="coverage-tags">
+                            <span class="coverage-tag">2008 – 2024</span>
+                        </div>
+                    </div>
+
+                    <div class="coverage-block">
+                        <div class="coverage-block-title">🗺️ States & Territories</div>
+                        <div class="coverage-tags">
+                            <span class="coverage-tag">ACT</span>,
+                            <span class="coverage-tag">NSW</span>,
+                            <span class="coverage-tag">NT</span>,
+                            <span class="coverage-tag">QLD</span>,
+                            <span class="coverage-tag">SA</span>,
+                            <span class="coverage-tag">TAS</span>,
+                            <span class="coverage-tag">VIC</span>,
+                            <span class="coverage-tag">WA</span>
+                        </div>
+                    </div>
+
+                    <div class="coverage-block">
+                        <div class="coverage-block-title">🚦 Offence Types</div>
+                        <div class="coverage-tags">
+                            <span class="coverage-tag">Speed Fines</span>,
+                            <span class="coverage-tag">Mobile Phone Use</span>,
+                            <span class="coverage-tag">Non-Wearing Seatbelts</span>,
+                            <span class="coverage-tag">Unlicensed Driving</span>
+                        </div>
+                    </div>
+
+                    <div class="coverage-block">
+                        <div class="coverage-block-title">🧪 Drug Types Tested</div>
+                        <div class="coverage-tags">
+                            <span class="coverage-tag">Amphetamine</span>,
+                            <span class="coverage-tag">Cannabis</span>,
+                            <span class="coverage-tag">Cocaine</span>,
+                            <span class="coverage-tag">Ecstasy</span>,
+                            <span class="coverage-tag">Methylamphetamine</span>
+                        </div>
+                    </div>
+
+                    <div class="coverage-block">
+                        <div class="coverage-block-title">📍 Location Categories</div>
+                        <div class="coverage-tags">
+                            <span class="coverage-tag">Major Cities</span>,
+                            <span class="coverage-tag">Inner Regional</span>,
+                            <span class="coverage-tag">Outer Regional</span>,
+                            <span class="coverage-tag">Remote</span>,
+                            <span class="coverage-tag">Very Remote</span>
+                        </div>
+                    </div>
+
+                    <div class="coverage-block">
+                        <div class="coverage-block-title">👥 Age Groups</div>
+                        <div class="coverage-tags">
+                            <span class="coverage-tag">Under 17</span>,
+                            <span class="coverage-tag">17–25</span>,
+                            <span class="coverage-tag">26–39</span>,
+                            <span class="coverage-tag">40–64</span>,
+                            <span class="coverage-tag">65 and over</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stats-title">Key Enforcement Report · 2023–2024</div>
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-card-icon">💰</div>
+                    <div class="stat-card-value">3,888,724</div>
+                    <div class="stat-card-label">Total Road Fines Issued</div>
+                    <div class="stat-card-sub">Across all states & offence types</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-card-icon">🧪</div>
+                    <div class="stat-card-value">176,493</div>
+                    <div class="stat-card-label">Positive Drug Tests</div>
+                    <div class="stat-card-sub">Combined 2023 & 2024</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-card-icon">🫁</div>
+                    <div class="stat-card-value">116,984</div>
+                    <div class="stat-card-label">Positive Breath Tests</div>
+                    <div class="stat-card-sub">Combined 2023 & 2024</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-card-icon">⚖️</div>
+                    <div class="stat-card-value">94,202</div>
+                    <div class="stat-card-label">Drug-Related Charges</div>
+                    <div class="stat-card-sub">Filed across all states</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-card-icon">🚔</div>
+                    <div class="stat-card-value">3,108</div>
+                    <div class="stat-card-label">Total Arrests</div>
+                    <div class="stat-card-sub">Drug & breath combined</div>
+                </div>
+                <div class="stat-card teal">
+                    <div class="stat-card-icon">📊</div>
+                    <div class="stat-card-value">12,179</div>
+                    <div class="stat-card-label">Records Analysed</div>
+                    <div class="stat-card-sub">Raw enforcement records</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-cards-section">
+            <div class="nav-cards-title">Explore the Data</div>
+            <div class="nav-cards-grid">
+                <div class="nav-card" onclick="switchPage('fines')">
+                    <div class="nav-card-icon">💰</div>
+                    <div class="nav-card-title">Fines</div>
+                    <div class="nav-card-desc">Explore road fines by state, age group, offence type and location across Australia.</div>
+                    <div class="nav-card-arrow">→</div>
+                </div>
+                <div class="nav-card" onclick="switchPage('drugs')">
+                    <div class="nav-card-icon">🧪</div>
+                    <div class="nav-card-title">Drug Tests</div>
+                    <div class="nav-card-desc">How has drug driving changed? Explore 16 years of trends by state and substance type.</div>
+                    <div class="nav-card-arrow">→</div>
+                </div>
+                <div class="nav-card" onclick="switchPage('breath')">
+                    <div class="nav-card-icon">🫁</div>
+                    <div class="nav-card-title">Breath Tests</div>
+                    <div class="nav-card-desc">Track positive breath test trends over 16 years and compare enforcement across states.</div>
+                    <div class="nav-card-arrow">→</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="limitations-section">
+            <div class="limitations-title">⚠️ Data Governance Notes</div>
+            <div class="limitations-grid">
+                <div class="limitation-item">
+                    <strong>Northern Territory:</strong> In 2023, both roadside drug tests conducted and positive tests were not provided. Only positive drug test results were reported.
+                </div>
+                <div class="limitation-item">
+                    <strong>Tasmania:</strong> Did not report breath test data for 2023–2024 and is excluded from breath test comparisons.
+                </div>
+                <div class="limitation-item">
+                    <strong>Location Data:</strong> NT, QLD, TAS and WA did not report location breakdowns — only NSW, VIC, SA and ACT have location-level data.
+                </div>
+                <div class="limitation-item">
+                    <strong>Unknown Age Group:</strong> Large numbers of camera-detected offences in NSW, QLD and VIC have no associated age data and are excluded from age group charts.
+                </div>
+                <div class="limitation-item">
+                    <strong>Fines Data:</strong> Fines are not reported or available for roadside enforcement actions in ACT, QLD, and WA.
+                </div>
+                <div class="limitation-item">
+                    <strong>Arrests Data:</strong> Arrests are not reported or available for roadside enforcement actions in NSW.
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-footer">
+            <p>Data sourced from the Bureau of Infrastructure and Transport Research Economics (BITRE), 2024.</p>
+            <p>COS30045 Data Visualization | Group 10 | Kartikyogam | Kugendran</p>
+        </div>
+    </div>
+
+    <div id="page-fines" class="page">
+        <div class="page-header">
+            <div class="page-header-left">
+                <div class="page-tag">01 — Fines</div>
+                <h2>Road Fines Across Australia</h2>
+                <p>Historical trends, state comparisons, age group and location breakdown</p>
+            </div>
+            <div class="page-controls">
+                <label>State:</label>
+                <select id="fines-state-filter"><option value="all">All States</option></select>
+                <label>Offence:</label>
+                <select id="fines-offence-filter"><option value="all">All Offences</option></select>
+            </div>
+        </div>
+
+        <div class="mini-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <div class="mini-stat">
+                <div class="mini-stat-label">Total Fines Issued</div>
+                <div class="mini-stat-value" id="fines-total">—</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-label">Total Related Arrests</div>
+                <div class="mini-stat-value" id="fines-arrests">—</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-label">Total Related Charges</div>
+                <div class="mini-stat-value" id="fines-charges">—</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-label">Top Offence Type</div>
+                <div class="mini-stat-value" id="fines-top-offence">—</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-label">Highest State Volume</div>
+                <div class="mini-stat-value" id="fines-top-state">—</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-label">Top Age Demographic</div>
+                <div class="mini-stat-value" id="fines-top-age">—</div>
+            </div>
+        </div>
+
+        <div class="chart-card full-width">
+            <div class="chart-card-title">Historical Fines Trend by Offence Type (2008–2024)</div>
+            <div id="fines-historical-chart"></div>
+        </div>
+
+        <div class="charts-grid-2">
+            <div class="chart-card">
+                <div class="chart-card-title">Fines by State </div>
+                <div id="fines-state-chart"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-card-title">Fines by Age Group (2023-2024)</div>
+                <div id="fines-age-chart"></div>
+            </div>
+        </div>
+
+        <div class="chart-card full-width">
+            <div class="chart-card-title">Fines by Location Type</div>
+            <div id="fines-location-chart"></div>
+        </div>
+    </div>
+
+    <div id="page-drugs" class="page">
+        <div class="page-header">
+            <div class="page-header-left">
+                <div class="page-tag">02 — Drug Tests</div>
+                <h2>Positive Drug Tests Across Australia</h2>
+                <p>16-year trend, drug type breakdown and state-by-state enforcement</p>
+            </div>
+            <div class="page-controls">
+                <label>State:</label>
+                <select id="drug-state-filter"><option value="all">All States</option></select>
+            </div>
+        </div>
+
+        <div class="mini-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <div class="mini-stat">
+                <div class="mini-stat-label">Total Positive Tests</div>
+                <div class="mini-stat-value" id="drug-total">—</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-label">Total Charges</div>
+                <div class="mini-stat-value" id="drug-charges">—</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-label">Total Arrests</div>
+                <div class="mini-stat-value" id="drug-arrests">—</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-label">Most Common Drug</div>
+                <div class="mini-stat-value" id="drug-top">—</div>
+            </div>
+        </div>
+
+        <div class="chart-card full-width">
+            <div class="chart-card-title">Historical Drug Test Trend by State (2008–2024)</div>
+            <div id="drug-historical-chart"></div>
+        </div>
+
+        <div class="charts-grid-2">
+            <div class="chart-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div class="chart-card-title" style="margin: 0;">Drug Type Breakdown (2023–2024)</div>
+                    <div style="display: flex; align-items: center;">
+                        <label style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: #64748b; margin-right: 6px;">Year:</label>
+                        <select id="donut-year-filter" style="padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 11px; color: #475569; background-color: #fff; cursor: pointer; outline: none;">
+                            <option value="all">2023-2024 (Total)</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="drug-donut-chart"></div>
+            </div>
+
+            <div class="chart-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div class="chart-card-title" style="margin: 0;">Positive Tests by State (2023–2024)</div>
+                    <div style="display: flex; align-items: center;">
+                        <label style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: #64748b; margin-right: 6px;">Year:</label>
+                        <select id="lollipop-year-filter" style="padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 11px; color: #475569; background-color: #fff; cursor: pointer; outline: none;">
+                            <option value="all">2023-2024 (Total)</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="drug-bar-chart"></div>
+            </div>
+        </div>
+
+        <div class="chart-card full-width">
+            <div class="chart-card-title">Enforcement Actions by State — Fines, Arrests & Charges</div>
+            <div id="drug-actions-chart"></div>
+        </div>
+    </div>
+
+    <div id="page-breath" class="page">
+        <div class="page-header">
+            <div class="page-header-left">
+                <div class="page-tag">03 — Breath Tests</div>
+                <h2>Positive Breath Tests Across Australia</h2>
+                <p>16-year trend and state-by-state enforcement activity</p>
+            </div>
+            <div class="page-controls">
+                <label>State:</label>
+                <select id="breath-state-filter"><option value="all">All States</option></select>
+            </div>
+        </div>
+
+        <div class="mini-stats">
+            <div class="mini-stat">
+                <div class="mini-stat-label">Total Positive Tests</div>
+                <div class="mini-stat-value" id="breath-total">—</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-label">Total Charges</div>
+                <div class="mini-stat-value" id="breath-charges">—</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-label">Total Arrests</div>
+                <div class="mini-stat-value" id="breath-arrests">—</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-label">Top State</div>
+                <div class="mini-stat-value" id="breath-top-state">—</div>
+            </div>
+        </div>
+
+        <div class="chart-card full-width">
+            <div class="chart-card-title">Historical Breath Test Trend by State (2008–2024)</div>
+            <div id="breath-historical-chart"></div>
+        </div>
+
+<div class="charts-grid-2">
+            <div class="chart-card">
+                <div class="chart-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div class="chart-card-title" style="margin: 0;">Enforcement Outcome Ratios</div>
+                    <select id="breath-donut-year-filter" class="dashboard-dropdown" style="padding: 4px 8px; font-size: 12px; min-width: 100px;"></select>
+                </div>
+                <div id="breath-donut-chart"></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div class="chart-card-title" style="margin: 0;">Age Profile Distribution</div>
+                    <select id="breath-bar-year-filter" class="dashboard-dropdown" style="padding: 4px 8px; font-size: 12px; min-width: 100px;"></select>
+                </div>
+                <div id="breath-bar-chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/fines.js"></script>
+    <script src="js/drug-tests.js"></script>
+    <script src="js/breath-tests.js"></script>
+
+</body>
+</html>

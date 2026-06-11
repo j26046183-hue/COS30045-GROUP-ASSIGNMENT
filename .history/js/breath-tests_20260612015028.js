@@ -29,6 +29,9 @@ const breathAgeColors = ["#bfdbfe", "#60a5fa", "#2563eb", "#1d4ed8", "#1e3a8a"];
 let breathHistoricalData = [];
 let breathModernData     = [];
 
+// States list that do NOT contain modern/regional/age breakdown data
+const noModernDataStates = ["NT", "QLD", "SA", "TAS", "WA"];
+
 // ── LOAD DATA ──
 Promise.all([
     d3.csv("data/breath_historical_trend.csv").catch(err => {
@@ -63,11 +66,32 @@ Promise.all([
     breathHistoricalData = historical;
     breathModernData     = modern;
 
-    // ── Populate state filter from historical (has all 8 states) ──
-    const states = [...new Set(historical.map(d => d.STATE))].sort();
+    // ── 1) Populate master state filter (Line Chart Only - has all 8 states) ──
+    const allStates = [...new Set(historical.map(d => d.STATE))].sort();
     const stateFilter = d3.select("#breath-state-filter");
-    stateFilter.selectAll("option:not([value='all'])").remove();
-    states.forEach(s => stateFilter.append("option").attr("value", s).text(s));
+    if (stateFilter.node()) {
+        stateFilter.selectAll("option:not([value='all'])").remove();
+        allStates.forEach(s => stateFilter.append("option").attr("value", s).text(s));
+    }
+
+    // Filter down states that actually contain valid modern data breakdown
+    const validModernStates = allStates.filter(s => !noModernDataStates.includes(s));
+
+    // ── 2) Populate isolated State Filter for Donut Chart ──
+    const donutStateSelect = d3.select("#breath-donut-state-filter");
+    if (donutStateSelect.node()) {
+        donutStateSelect.selectAll("option").remove();
+        donutStateSelect.append("option").attr("value", "all").text("All Available States");
+        validModernStates.forEach(s => donutStateSelect.append("option").attr("value", s).text(s));
+    }
+
+    // ── 3) Populate isolated State Filter for Bar Chart ──
+    const barStateSelect = d3.select("#breath-bar-state-filter");
+    if (barStateSelect.node()) {
+        barStateSelect.selectAll("option").remove();
+        barStateSelect.append("option").attr("value", "all").text("All Available States");
+        validModernStates.forEach(s => barStateSelect.append("option").attr("value", s).text(s));
+    }
 
     // ── Populate year filters for donut and bar ──
     const uniqueYears = [...new Set(modern.map(d => d.YEAR))].sort((a,b) => b - a);
@@ -86,27 +110,35 @@ Promise.all([
         uniqueYears.forEach(y => barYearSelect.append("option").attr("value", y).text(y));
     }
 
+    // ── Append static data warnings/notes below chart elements ──
+    addModernDataNotes();
+
     // ── Event listeners ──
-    d3.select("#breath-state-filter").on("change", applyBreathFilters);
+    d3.select("#breath-state-filter").on("change", updateLineChartOnly);
+    if (donutStateSelect.node()) donutStateSelect.on("change", updateDonutOnly);
     if (donutYearSelect.node()) donutYearSelect.on("change", updateDonutOnly);
+    if (barStateSelect.node()) barStateSelect.on("change", updateBarOnly);
     if (barYearSelect.node())   barYearSelect.on("change", updateBarOnly);
 
-    applyBreathFilters();
+    // Initial render call for all isolated components
+    updateLineChartOnly();
+    updateDonutOnly();
+    updateBarOnly();
 
 }).catch(err => console.error("Breath test data load error:", err));
 
 
-// ── MASTER FILTER ──
-function applyBreathFilters() {
+// ── 1) LINE CHART & STATS ONLY FILTER ──
+function updateLineChartOnly() {
     const selectedState = d3.select("#breath-state-filter").property("value") || "all";
 
-    // Filter historical for line chart
+    // Filter historical for line chart only
     let filteredHistorical = breathHistoricalData.slice();
     if (selectedState !== "all") {
         filteredHistorical = filteredHistorical.filter(d => d.STATE === selectedState);
     }
 
-    // Mini stats — use historical 2023+2024 data (has all states)
+    // Mini stats calculation
     const hist2324 = breathHistoricalData.filter(d =>
         d.YEAR >= 2023 && (selectedState === "all" || d.STATE === selectedState)
     );
@@ -114,7 +146,6 @@ function applyBreathFilters() {
     const totalCharges = d3.sum(hist2324, d => d["TOTAL CHARGES"]);
     const totalArrests = d3.sum(hist2324, d => d["TOTAL ARRESTS"]);
 
-    // Top state by total positive tests across all years
     const stateMap = d3.rollup(breathHistoricalData, v => d3.sum(v, d => d.COUNT), d => d.STATE);
     const topState = [...stateMap.entries()].sort((a,b) => b[1] - a[1])[0];
 
@@ -123,18 +154,17 @@ function applyBreathFilters() {
     d3.select("#breath-arrests").text(totalArrests.toLocaleString());
     d3.select("#breath-top-state").text(topState ? topState[0] : "—");
 
-    // Draw line chart
     drawBreathHistorical(filteredHistorical);
-
-    // Draw donut and bar with their own year filters
-    updateDonutOnly();
-    updateBarOnly();
 }
 
+
+// ── 2) DOUGHNUT CHART ONLY FILTER ──
 function updateDonutOnly() {
-    const selectedState = d3.select("#breath-state-filter").property("value") || "all";
-    const donutNode     = d3.select("#breath-donut-year-filter").node();
-    const selectedYear  = donutNode ? donutNode.value : "all";
+    const stateNode = d3.select("#breath-donut-state-filter").node();
+    const yearNode  = d3.select("#breath-donut-year-filter").node();
+    
+    const selectedState = stateNode ? stateNode.value : "all";
+    const selectedYear  = yearNode ? yearNode.value : "all";
 
     let filtered = breathModernData.slice();
     if (selectedState !== "all") filtered = filtered.filter(d => d.STATE === selectedState);
@@ -143,16 +173,52 @@ function updateDonutOnly() {
     drawBreathRegionalDonut(filtered, selectedState);
 }
 
+
+// ── 3) AGE BAR CHART ONLY FILTER ──
 function updateBarOnly() {
-    const selectedState = d3.select("#breath-state-filter").property("value") || "all";
-    const barNode       = d3.select("#breath-bar-year-filter").node();
-    const selectedYear  = barNode ? barNode.value : "all";
+    const stateNode = d3.select("#breath-bar-state-filter").node();
+    const yearNode  = d3.select("#breath-bar-year-filter").node();
+
+    const selectedState = stateNode ? stateNode.value : "all";
+    const selectedYear  = yearNode ? yearNode.value : "all";
 
     let filtered = breathModernData.slice();
     if (selectedState !== "all") filtered = filtered.filter(d => d.STATE === selectedState);
     if (selectedYear  !== "all") filtered = filtered.filter(d => d.YEAR === +selectedYear);
 
     drawBreathAgeBar(filtered, selectedState);
+}
+
+
+// Helper function to append static user notices under charts
+function addModernDataNotes() {
+    const noteText = `* Note: Granular breakdowns are only available for ACT, NSW, and VIC. Historical data remains available for all territories. States without data (${noModernDataStates.join(", ")}) have been omitted from selection filter.`;
+    
+    // Add note under doughnut chart if space exists
+    if (d3.select("#breath-donut-chart-note").empty() && d3.select("#breath-donut-chart").node()) {
+        d3.select("#breath-donut-chart").attr("style", "position:relative;")
+          .append("div")
+          .attr("id", "breath-donut-chart-note")
+          .style("font-size", "11px")
+          .style("color", "#64748b")
+          .style("margin-top", "10px")
+          .style("font-family", "DM Sans, sans-serif")
+          .style("line-height", "1.4")
+          .text(noteText);
+    }
+
+    // Add note under bar chart if space exists
+    if (d3.select("#breath-bar-chart-note").empty() && d3.select("#breath-bar-chart").node()) {
+        d3.select("#breath-bar-chart").attr("style", "position:relative;")
+          .append("div")
+          .attr("id", "breath-bar-chart-note")
+          .style("font-size", "11px")
+          .style("color", "#64748b")
+          .style("margin-top", "10px")
+          .style("font-family", "DM Sans, sans-serif")
+          .style("line-height", "1.4")
+          .text(noteText);
+    }
 }
 
 
@@ -254,7 +320,6 @@ function drawBreathHistorical(data) {
                 breathTooltip.style("opacity", 0);
             });
     });
-
     // Legend
     const legend = svg.append("g").attr("transform", `translate(${width + 12}, 0)`);
     [...grouped.keys()].sort().forEach((state, i) => {
@@ -291,12 +356,9 @@ function drawBreathRegionalDonut(data, selectedState) {
     const chartG = svg.append("g")
         .attr("transform", `translate(${width/2}, ${margin.top + radius})`);
 
-    // States that don't have location data
-    const noLocStates = ["NT", "QLD", "SA", "TAS", "WA"];
-    const stateHasNoData = selectedState !== "all" && noLocStates.includes(selectedState);
+    const stateHasNoData = selectedState !== "all" && noModernDataStates.includes(selectedState);
 
     if (stateHasNoData) {
-        // Show no data message
         chartG.append("circle")
             .attr("r", radius)
             .attr("fill", "none")
@@ -383,7 +445,6 @@ function drawBreathRegionalDonut(data, selectedState) {
             d3.select(this).transition().duration(150).attr("d", arc);
             breathTooltip.style("opacity", 0);
         })
-        // Entry animation
         .transition().duration(700).delay((d,i) => i * 100)
         .attrTween("d", function(d) {
             const interp = d3.interpolate(
@@ -432,7 +493,6 @@ function drawBreathRegionalDonut(data, selectedState) {
     legendG.attr("transform", `translate(${(width - bounds.width) / 2}, ${margin.top + radius * 2 + 18})`);
 }
 
-
 // ══════════════════════════════════════════
 // CHART 3: AGE GROUP BAR CHART
 // ══════════════════════════════════════════
@@ -453,9 +513,7 @@ function drawBreathAgeBar(data, selectedState) {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // States with no age breakdown
-    const noAgeStates = ["NT", "QLD", "SA", "TAS", "WA"];
-    const stateHasNoData = selectedState !== "all" && noAgeStates.includes(selectedState);
+    const stateHasNoData = selectedState !== "all" && noModernDataStates.includes(selectedState);
 
     if (stateHasNoData || data.length === 0) {
         svg.append("text")
@@ -570,5 +628,9 @@ function drawBreathAgeBar(data, selectedState) {
         .text(d => d.value.toLocaleString());
 }
 
-// Resize support
-window.addEventListener("resize", applyBreathFilters);
+// Global Resize logic to redraw isolated views
+window.addEventListener("resize", () => {
+    updateLineChartOnly();
+    updateDonutOnly();
+    updateBarOnly();
+});
