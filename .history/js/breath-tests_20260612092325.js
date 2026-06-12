@@ -77,24 +77,9 @@ Promise.all([
     d3.select("#breakdown-year-filter").on("change", applyBreakdownFilters);
     d3.select("#breakdown-state-filter").on("change", applyBreakdownFilters);
 
-    // Initial render — defer so DOM is fully laid out first
-    requestAnimationFrame(() => {
-        applyBreathTopFilters();
-        applyBreakdownFilters();
-    });
-
-    // Re-render whenever the breath page becomes visible (e.g. nav tab click)
-    const breathPage = document.getElementById("page-breath");
-    if (breathPage && window.MutationObserver) {
-        new MutationObserver(() => {
-            if (breathPage.classList.contains("active")) {
-                requestAnimationFrame(() => {
-                    applyBreathTopFilters();
-                    applyBreakdownFilters();
-                });
-            }
-        }).observe(breathPage, { attributes: true, attributeFilter: ["class"] });
-    }
+    // Initial render
+    applyBreathTopFilters();
+    applyBreakdownFilters();
 
 }).catch(err => console.error("Breath test data load error:", err));
 
@@ -152,11 +137,10 @@ function drawBreathHistorical(data) {
     d3.select("#breath-historical-chart").selectAll("*").remove();
     if (!data || data.length === 0) return;
 
-    const margin = { top: 20, right: 150, bottom: 50, left: 75 };
+    const margin = { top: 20, right: 130, bottom: 50, left: 75 };
     const container = document.getElementById("breath-historical-chart");
     if (!container) return;
-    const rawWidth = container.getBoundingClientRect().width || container.offsetWidth;
-    const width  = Math.max(rawWidth - margin.left - margin.right, 200);
+    const width  = Math.max(container.offsetWidth - margin.left - margin.right, 100);
     const height = 300 - margin.top - margin.bottom;
 
     const svg = d3.select("#breath-historical-chart")

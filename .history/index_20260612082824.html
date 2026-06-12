@@ -383,7 +383,7 @@
         </div>
     </div>
 
-<div id="page-breath" class="page">
+    <div id="page-breath" class="page">
         <div class="page-header">
             <div class="page-header-left">
                 <div class="page-tag">03 — Breath Tests</div>
@@ -391,8 +391,8 @@
                 <p>16-year trend and state-by-state enforcement activity</p>
             </div>
             <div class="page-controls">
-                <label>State:</label>
-                <select id="breath-state-filter"><option value="all">All States</option></select>
+                <label>State (Line Chart):</label>
+                <select id="breath-line-state-filter"><option value="all">All States</option></select>
             </div>
         </div>
 
@@ -420,46 +420,25 @@
             <div id="breath-historical-chart"></div>
         </div>
 
-        <!-- Shared filter row for donut + bar -->
-        <div class="breakdown-filter-row" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; padding: 14px 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;">
-            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #475569; white-space: nowrap;">Breakdown Year:</label>
-                    <select id="breakdown-year-filter" style="padding: 5px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: #334155; background: #fff; cursor: pointer; outline: none;">
-                        <option value="all">All Years (2023–2024)</option>
-                        <option value="2023">2023</option>
-                        <option value="2024">2024</option>
-                    </select>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #475569; white-space: nowrap;">Breakdown State:</label>
-                    <select id="breakdown-state-filter" style="padding: 5px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: #334155; background: #fff; cursor: pointer; outline: none;">
-                        <option value="all">All Available States</option>
-                        <option value="ACT">ACT</option>
-                        <option value="NSW">NSW</option>
-                        <option value="NT">NT</option>
-                        <option value="VIC">VIC</option>
-                    </select>
-                </div>
-            </div>
-            <div style="font-family: 'DM Sans', sans-serif; font-size: 11px; color: #94a3b8; line-height: 1.5; max-width: 340px; text-align: right;">
-                ⚠️ <strong>Note:</strong> QLD, SA, TAS and WA do not report location or age breakdown data and are excluded from the charts below.
-            </div>
-        </div>
-
-        <div class="charts-grid-2">
+<div class="charts-grid-2">
             <div class="chart-card">
-                <div class="chart-card-title" style="margin-bottom: 15px;">Enforcement Outcome Ratios</div>
+                <div class="chart-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div class="chart-card-title" style="margin: 0;">Enforcement Outcome Ratios</div>
+                    <select id="breath-donut-year-filter" class="dashboard-dropdown" style="padding: 4px 8px; font-size: 12px; min-width: 100px;"></select>
+                </div>
                 <div id="breath-donut-chart"></div>
             </div>
 
             <div class="chart-card">
-                <div class="chart-card-title" style="margin-bottom: 15px;">Age Profile Distribution</div>
+                <div class="chart-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div class="chart-card-title" style="margin: 0;">Age Profile Distribution</div>
+                    <select id="breath-bar-year-filter" class="dashboard-dropdown" style="padding: 4px 8px; font-size: 12px; min-width: 100px;"></select>
+                </div>
                 <div id="breath-bar-chart"></div>
             </div>
         </div>
     </div>
-    
+
     <script src="js/main.js"></script>
     <script src="js/fines.js"></script>
     <script src="js/drug-tests.js"></script>
