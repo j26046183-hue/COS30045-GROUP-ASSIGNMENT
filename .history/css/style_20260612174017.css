@@ -845,19 +845,18 @@ body {
 /* =====================
    NOTES PANEL
 ===================== */
-
-/* Wrapper — display:contents so it creates no stacking context */
 #notes-panel {
-    display: contents;
-}
-
-/* Toggle tab — fixed to right edge, always on top */
-#notes-toggle {
     position: fixed;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 1100;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+}
+
+/* The vertical tab button on the right edge */
+#notes-toggle {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -869,6 +868,8 @@ body {
     padding: 14px 10px;
     cursor: pointer;
     transition: all 0.2s;
+    position: relative;
+    z-index: 2;
 }
 
 #notes-toggle::before {
@@ -904,7 +905,7 @@ body {
     transform: rotate(180deg);
 }
 
-/* The slide-in drawer — fixed independently, high z-index */
+/* The slide-in drawer */
 #notes-drawer {
     position: fixed;
     right: -380px;
@@ -916,8 +917,8 @@ body {
     display: flex;
     flex-direction: column;
     transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1099;
-    box-shadow: -8px 0 40px rgba(0,0,0,0.5);
+    z-index: 1;
+    box-shadow: -8px 0 40px rgba(0,0,0,0.4);
 }
 
 #notes-drawer.open {
@@ -1020,8 +1021,10 @@ body {
     padding-left: 18px;
 }
 
-/* Toggle active state when drawer is open */
-#notes-toggle.active {
-    border-color: rgba(245,158,11,0.35);
+/* Panel active state — push toggle left slightly */
+#notes-panel.active #notes-toggle {
+    border-color: rgba(245,158,11,0.3);
     background: var(--surface-3);
 }
+
+/* Hide toggle on home page (handled by JS) */

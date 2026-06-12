@@ -224,8 +224,8 @@ function drawFinesHistorical(data) {
 
     // Y label
     svg.append("text")
-        .attr("x", -10).attr("y", -8)
-        .attr("text-anchor", "end").attr("font-size", "11px")
+        .attr("transform", "rotate(0)").attr("y", -65).attr("x", -height/2)
+        .attr("text-anchor", "middle").attr("font-size", "11px")
         .attr("fill", "#94a3b8").attr("font-family", "DM Sans, sans-serif")
         .text("Total Fines");
 
