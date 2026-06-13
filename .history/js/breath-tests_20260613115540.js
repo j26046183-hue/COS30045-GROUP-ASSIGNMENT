@@ -518,23 +518,14 @@ function drawBreathAgeBar(data, selectedState) {
 
     // Value labels
     svg.selectAll(".bar-label")
-    .data(chartData).enter().append("text")
-    .attr("class", "bar-label")
-    .attr("x", d => x(d.key) + x.bandwidth() / 2)
-    .attr("y", d => {
-        const barHeight = height - y(d.value);
-        return barHeight > 20 ? y(d.value) + 20 : y(d.value) - 8;
-    })
-    .attr("text-anchor", "middle")
-    .attr("font-size", "10px")
-    .attr("font-family", "DM Sans, sans-serif")
-    .attr("fill", d => (height - y(d.value)) > 20 ? "#ffffff" : "#475569")
-    .text(d => {
-        if (d.value === 0) return "";
-        if (d.value >= 1000000) return `${(d.value/1000000).toFixed(1)}M`;
-        if (d.value >= 1000)    return `${(d.value/1000).toFixed(0)}K`;
-        return d.value.toLocaleString();
-    });
+        .data(chartData).enter().append("text")
+        .attr("class", "bar-label")
+        .attr("x", d => x(d.key) + x.bandwidth() / 2)
+        .attr("y", d => y(d.value) - 6)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "11px").attr("fill", "#475569")
+        .attr("font-family", "DM Sans, sans-serif")
+        .text(d => d.value.toLocaleString());
 }
 
 // Resize support

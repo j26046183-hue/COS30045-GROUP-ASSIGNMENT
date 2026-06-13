@@ -417,10 +417,19 @@ body {
 .stat-card.teal::after    { display: none; }
 .stat-card.teal:hover     { box-shadow: 0 8px 24px rgba(8,145,178,0.4); }
 
-.stat-card-value { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 700; color: #ffffff; margin-bottom: 3px; letter-spacing: -0.5px; }
-.stat-card-label { font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 500; margin-bottom: 1px; }
-.stat-card-sub   { font-size: 10px; color: rgba(255,255,255,0.6); }
-.stat-card-icon  { font-size: 17px; margin-bottom: 8px; }
+.stat-card-icon { font-size: 18px; margin-bottom: 10px; }
+
+.stat-card-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+}
+
+.stat-card-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; margin-bottom: 2px; }
+.stat-card-sub   { font-size: 10px; color: var(--text-muted); }
 
 /* =====================
    NAV CARDS

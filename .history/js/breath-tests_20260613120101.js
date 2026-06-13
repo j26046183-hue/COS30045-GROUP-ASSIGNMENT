@@ -523,12 +523,12 @@ function drawBreathAgeBar(data, selectedState) {
     .attr("x", d => x(d.key) + x.bandwidth() / 2)
     .attr("y", d => {
         const barHeight = height - y(d.value);
-        return barHeight > 20 ? y(d.value) + 20 : y(d.value) - 8;
+        return barHeight > 40 ? y(d.value) + 20 : y(d.value) - 8;
     })
     .attr("text-anchor", "middle")
     .attr("font-size", "10px")
     .attr("font-family", "DM Sans, sans-serif")
-    .attr("fill", d => (height - y(d.value)) > 20 ? "#ffffff" : "#475569")
+    .attr("fill", d => (height - y(d.value)) > 40 ? "#ffffff" : "#475569")
     .text(d => {
         if (d.value === 0) return "";
         if (d.value >= 1000000) return `${(d.value/1000000).toFixed(1)}M`;

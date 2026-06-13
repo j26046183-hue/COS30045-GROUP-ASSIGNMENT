@@ -215,46 +215,28 @@
         </div>
 
         <div class="limitations-section">
-    <div class="limitations-title">⚠️ Data Governance Notes</div>
-    <div class="limitations-grid">
-        <div class="limitation-item">
-            <strong>Northern Territory:</strong> In 2023, both roadside drug tests conducted and positive tests were not provided. Only positive drug test results were reported.
+            <div class="limitations-title">⚠️ Data Governance Notes</div>
+            <div class="limitations-grid">
+                <div class="limitation-item">
+                    <strong>Northern Territory:</strong> In 2023, both roadside drug tests conducted and positive tests were not provided. Only positive drug test results were reported.
+                </div>
+                <div class="limitation-item">
+                    <strong>Tasmania:</strong> Did not report breath test data for 2023–2024 and is excluded from breath test comparisons.
+                </div>
+                <div class="limitation-item">
+                    <strong>Location Data:</strong> NT, QLD, TAS and WA did not report location breakdowns — only NSW, VIC, SA and ACT have location-level data.
+                </div>
+                <div class="limitation-item">
+                    <strong>Unknown Age Group:</strong> Large numbers of camera-detected offences in NSW, QLD and VIC have no associated age data and are excluded from age group charts.
+                </div>
+                <div class="limitation-item">
+                    <strong>Fines Data:</strong> Fines are not reported or available for roadside enforcement actions in ACT, QLD, and WA.
+                </div>
+                <div class="limitation-item">
+                    <strong>Arrests Data:</strong> Arrests are not reported or available for roadside enforcement actions in NSW.
+                </div>
+            </div>
         </div>
-        <div class="limitation-item">
-            <strong>Tasmania:</strong> Did not report breath test data for 2023–2024 and is excluded from breath test comparisons.
-        </div>
-        <div class="limitation-item">
-            <strong>Location Data:</strong> NT, QLD, TAS and WA did not report location breakdowns — only NSW, VIC, SA and ACT have location-level data.
-        </div>
-        <div class="limitation-item">
-            <strong>Unknown Age Group:</strong> Large numbers of camera-detected offences in NSW, QLD and VIC have no associated age data and are excluded from age group charts.
-        </div>
-        <div class="limitation-item">
-            <strong>Fines Data:</strong> Fines are not reported or available for roadside enforcement actions in ACT, QLD, and WA.
-        </div>
-        <div class="limitation-item">
-            <strong>Arrests Data:</strong> Arrests are not reported or available for roadside enforcement actions in NSW.
-        </div>
-        <div class="limitation-item">
-            <strong>NSW Mobile Phone Fines:</strong> Jumped 6× from 2019 to 2020 due to the rollout of fixed camera-based detection — not a sudden rise in offending behaviour.
-        </div>
-        <div class="limitation-item">
-            <strong>Seatbelt & Unlicensed Data:</strong> Seatbelt fines were not reported by most states before 2017. Unlicensed driving fines only appear from 2023 onwards.
-        </div>
-        <div class="limitation-item">
-            <strong>QLD & TAS Drug Types:</strong> Do not report positive tests broken down by drug substance — excluded from drug type breakdown charts.
-        </div>
-        <div class="limitation-item">
-            <strong>VIC Breath Tests:</strong> Records positive test counts but reports zero fines, charges and arrests — enforcement outcome data is not provided by VIC.
-        </div>
-        <div class="limitation-item">
-            <strong>ACT Breath Tests:</strong> No fines issued for positive breath tests — offences are processed through courts rather than on-the-spot fines.
-        </div>
-        <div class="limitation-item">
-            <strong>COVID-19 Impact:</strong> Most states recorded notable dips in drug and breath test detections during 2020–2021 due to reduced road activity during lockdowns.
-        </div>
-    </div>
-</div>
 
         <div class="dash-footer">
             <p>Data sourced from the Bureau of Infrastructure and Transport Research Economics (BITRE), 2024.</p>
@@ -439,31 +421,31 @@
         </div>
 
         <!-- Shared filter row for donut + bar -->
-        <div class="breakdown-filter-row" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 16px 40px; padding: 12px 0;">
-            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #475569; white-space: nowrap;">Breakdown Year:</label>
-                    <select id="breakdown-year-filter" style="padding: 5px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: #334155; background: #fff; cursor: pointer; outline: none;">
-                        <option value="all">All Years (2023–2024)</option>
-                        <option value="2023">2023</option>
-                        <option value="2024">2024</option>
-                    </select>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #475569; white-space: nowrap;">Breakdown State:</label>
-                    <select id="breakdown-state-filter" style="padding: 5px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: #334155; background: #fff; cursor: pointer; outline: none;">
-                        <option value="all">All Available States</option>
-                        <option value="ACT">ACT</option>
-                        <option value="NSW">NSW</option>
-                        <option value="NT">NT</option>
-                        <option value="VIC">VIC</option>
-                    </select>
-                </div>
-            </div>
-            <div style="font-family: 'DM Sans', sans-serif; font-size: 11px; color: #94a3b8; line-height: 1.5; max-width: 320px;">
-                ⚠️ <strong>Note:</strong> QLD, SA, TAS and WA do not report location or age breakdown data and are excluded from the charts below.
-            </div>
+        <div class="breakdown-filter-row" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 40px 16px 40px; padding: 12px 20px; border-radius: 12px;">
+    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <label style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #475569; white-space: nowrap;">Breakdown Year:</label>
+            <select id="breakdown-year-filter" style="padding: 5px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: #334155; background: #fff; cursor: pointer; outline: none;">
+                <option value="all">All Years (2023–2024)</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+            </select>
         </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <label style="font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #475569; white-space: nowrap;">Breakdown State:</label>
+            <select id="breakdown-state-filter" style="padding: 5px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: #334155; background: #fff; cursor: pointer; outline: none;">
+                <option value="all">All Available States</option>
+                <option value="ACT">ACT</option>
+                <option value="NSW">NSW</option>
+                <option value="NT">NT</option>
+                <option value="VIC">VIC</option>
+            </select>
+        </div>
+    </div>
+    <div style="font-family: 'DM Sans', sans-serif; font-size: 11px; color: #94a3b8; line-height: 1.5; max-width: 320px;">
+        ⚠️ <strong>Note:</strong> QLD, SA, TAS and WA do not report location or age breakdown data and are excluded from the charts below.
+    </div>
+</div>
 
         <div class="charts-grid-2">
             <div class="chart-card">

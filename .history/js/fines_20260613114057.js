@@ -32,7 +32,7 @@ const locColors = {
     "Outer Regional Australia":  "#f59e0b",
     "Remote Australia":          "#ef4444",
     "Very Remote Australia":     "#8b5cf6",
-    "Location Not Specified":    "#ff00bf"   // renamed Unknown
+    "Location Not Specified":    "#94a3b8"   // renamed Unknown
 };
 
 const locationOrder = [
@@ -492,7 +492,7 @@ function drawFinesLocation(data) {
         .map(loc => ({
             location: loc,
             value:    locMap.get(loc) || 0,
-            color:    locColors[loc]  || "#ff00bf"
+            color:    locColors[loc]  || "#94a3b8"
         }))
         .sort((a,b) => b.value - a.value);
 

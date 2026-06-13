@@ -32,7 +32,7 @@ const locColors = {
     "Outer Regional Australia":  "#f59e0b",
     "Remote Australia":          "#ef4444",
     "Very Remote Australia":     "#8b5cf6",
-    "Location Not Specified":    "#ff00bf"   // renamed Unknown
+    "Location Not Specified":    "#94a3b8"   // renamed Unknown
 };
 
 const locationOrder = [
@@ -447,8 +447,7 @@ function drawFinesAge(data) {
         .attr("y",      d => d.value > 0 ? y(d.value) : height)
         .attr("height", d => d.value > 0 ? Math.max(height - y(d.value), 3) : 0);
 
-    // Labels
-  // Labels
+// Labels
     svg.selectAll(".bar-label").data(chartData).enter().append("text")
         .attr("class", "bar-label")
         .attr("x", d => x(d.age) + x.bandwidth() / 2)
@@ -492,7 +491,7 @@ function drawFinesLocation(data) {
         .map(loc => ({
             location: loc,
             value:    locMap.get(loc) || 0,
-            color:    locColors[loc]  || "#ff00bf"
+            color:    locColors[loc]  || "#94a3b8"
         }))
         .sort((a,b) => b.value - a.value);
 

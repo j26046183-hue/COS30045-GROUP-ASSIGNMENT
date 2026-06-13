@@ -32,7 +32,7 @@ const locColors = {
     "Outer Regional Australia":  "#f59e0b",
     "Remote Australia":          "#ef4444",
     "Very Remote Australia":     "#8b5cf6",
-    "Location Not Specified":    "#ff00bf"   // renamed Unknown
+    "Location Not Specified":    "#94a3b8"   // renamed Unknown
 };
 
 const locationOrder = [
@@ -448,27 +448,21 @@ function drawFinesAge(data) {
         .attr("height", d => d.value > 0 ? Math.max(height - y(d.value), 3) : 0);
 
     // Labels
-  // Labels
     svg.selectAll(".bar-label").data(chartData).enter().append("text")
         .attr("class", "bar-label")
         .attr("x", d => x(d.age) + x.bandwidth() / 2)
-        .attr("y", d => {
-            const barHeight = height - y(d.value);
-            return barHeight > 30 ? y(d.value) + 20 : y(d.value) - 8;
-        })
-        .attr("text-anchor", "middle")
-        .attr("font-size", "10px")
-        .attr("font-family", "DM Sans, sans-serif")
-        .attr("fill", d => (height - y(d.value)) > 30 ? "#ffffff" : "#475569")
-        .text(d => {
-            if (d.value === 0) return "";
-            if (d.value >= 1000000) return `${(d.value/1000000).toFixed(1)}M`;
-            if (d.value >= 1000)    return `${(d.value/1000).toFixed(0)}K`;
-            return d.value.toLocaleString();
-        });
+        .attr("y", d => d.value > 0 ? y(d.value) - 6 : height - 6)
+        .attr("text-anchor", "middle").attr("font-size", "11px")
+        .attr("fill", "#475569").attr("font-family", "DM Sans, sans-serif")
+        .text(d => d.value === 0 ? "" : d.value.toLocaleString());
 }
 
+
+// ══════════════════════════════════════════
 // CHART 4: FINES BY LOCATION (horizontal bar)
+// Unknown renamed → "Location Not Specified"
+// so NT/QLD/TAS/WA always show something
+// ══════════════════════════════════════════
 function drawFinesLocation(data) {
     d3.select("#fines-location-chart").selectAll("*").remove();
     const container = document.getElementById("fines-location-chart");
@@ -492,7 +486,7 @@ function drawFinesLocation(data) {
         .map(loc => ({
             location: loc,
             value:    locMap.get(loc) || 0,
-            color:    locColors[loc]  || "#ff00bf"
+            color:    locColors[loc]  || "#94a3b8"
         }))
         .sort((a,b) => b.value - a.value);
 
@@ -550,24 +544,14 @@ function drawFinesLocation(data) {
         .transition().duration(700).delay((d,i) => i * 100)
         .attr("width", d => Math.max(x(d.value), 0));
 
-// Labels
+    // Labels
     svg.selectAll(".bar-label").data(chartData).enter().append("text")
         .attr("class", "bar-label")
-        .attr("x", d => {
-            const barWidth = x(d.value);
-            return barWidth > 80 ? barWidth - 8 : barWidth + 8;
-        })
+        .attr("x", d => Math.max(x(d.value), 0) + 8)
         .attr("y", d => y(d.location) + y.bandwidth() / 2 + 4)
-        .attr("text-anchor", d => x(d.value) > 80 ? "end" : "start")
-        .attr("font-size", "11px")
+        .attr("font-size", "11px").attr("fill", "#475569")
         .attr("font-family", "DM Sans, sans-serif")
-        .attr("fill", d => x(d.value) > 80 ? "#ffffff" : "#475569")
-        .text(d => {
-            const v = d.value;
-            if (v >= 1000000) return `${(v/1000000).toFixed(1)}M`;
-            if (v >= 1000)    return `${(v/1000).toFixed(0)}K`;
-            return v.toLocaleString();
-        });
+        .text(d => d.value.toLocaleString());
 
     // Legend
     const legend = svg.append("g").attr("transform", `translate(${width + 16}, 0)`);

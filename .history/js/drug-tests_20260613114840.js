@@ -481,31 +481,24 @@ function drawDrugActions(data) {
 
     
     stateGroups.selectAll(".bar-count-label")
-    .data(state => actions.map(action => ({
-        action,
-        value: stateMap.get(state)[action]
-    })))
-    .enter().append("text")
-    .attr("class", "bar-count-label")
-    .attr("x", d => x1(d.action) + x1.bandwidth() / 2)
-    .attr("text-anchor", "middle")
-    .style("font-family", "DM Sans, sans-serif")
-    .style("font-size", "9px")
-    .style("font-weight", "500")
-    .style("fill", d => (height - y(d.value)) > 25 ? "#ffffff" : "#64748b")
-    .attr("y", height)
-    .text(d => {
-        if (d.value === 0) return "";
-        if (d.value >= 1000) return `${(d.value/1000).toFixed(1)}K`;
-        return d.value.toLocaleString();
-    })
-    .transition().duration(700).delay((d,i) => i * 40)
-    .attr("y", d => {
-        if (d.value === 0) return height;
-        const barHeight = height - y(d.value);
-        // inside bar if tall enough, otherwise above
-        return barHeight > 25 ? y(d.value) + 14 : y(d.value) - 5;
-    });
+        .data(state => actions.map(action => ({
+            action,
+            value: stateMap.get(state)[action]
+        })))
+        .enter().append("text")
+        .attr("class", "bar-count-label")
+        .attr("x", d => x1(d.action) + x1.bandwidth() / 2) // Target the horizontal center of the target bar
+        .attr("text-anchor", "middle")
+        .style("font-family", "DM Sans, sans-serif")
+        .style("font-size", "11px")
+        .style("font-weight", "500")
+        .style("fill", "#475569") // Clean color matching your dashboard axis text
+        // Labels start hidden at the baseline to perfectly sync with rect entry animations
+        .attr("y", height)
+        .text(d => d.value > 0 ? d.value.toLocaleString() : "")
+        .transition().duration(700).delay((d,i) => i * 40)
+        // Transition upward to float exactly 5px cleanly above the fully grown bar top
+        .attr("y", d => d.value > 0 ? y(d.value) - 5 : height);
 
 
     // ── 4. SMART ANNOTATIONS FOR COMPLETELY EMPTY STATES (TAS & VIC) ──
